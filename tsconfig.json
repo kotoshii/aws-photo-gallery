@@ -17,7 +17,11 @@
     "jsx": "react-jsx",
     "paths": {
       "@constants/*": ["./src/constants/*"],
-      "@pages": ["./src/pages"]
+      "@pages": ["./src/pages"],
+      "@store/*": ["./src/store/*"],
+      "@store": ["./src/store"],
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@assets/*": ["./src/assets/*"]
     }
   },
   "include": ["src"],
