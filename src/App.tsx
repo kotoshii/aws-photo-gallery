@@ -9,10 +9,10 @@ function App() {
       <CssBaseline />
       <div className="App">
         <Routes>
-          <Route path={AppRoutes.ROOT} element={<Homepage />} />
-          <Route path={AppRoutes.AUTH} element={<Authentication />} />
+          <Route path={AppRoutes.Root} element={<Homepage />} />
+          <Route path={AppRoutes.Auth} element={<Authentication />} />
           <Route
-            path={AppRoutes.ACCOUNT_SETTINGS}
+            path={AppRoutes.AccountSettings}
             element={<AccountSettings />}
           />
         </Routes>

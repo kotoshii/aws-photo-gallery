@@ -1,5 +1,5 @@
 export enum AppRoutes {
-  ROOT = '/',
-  AUTH = '/authentication',
-  ACCOUNT_SETTINGS = '/account-settings',
+  Root = '/',
+  Auth = '/authentication',
+  AccountSettings = '/account-settings',
 }

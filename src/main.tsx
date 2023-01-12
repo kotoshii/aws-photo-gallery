@@ -13,6 +13,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './global.css';
+import { SnackbarProvider } from 'notistack';
 
 Amplify.configure(AwsConfig);
 
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <StoreProvider store={store}>
-          <App />
+          <SnackbarProvider>
+            <App />
+          </SnackbarProvider>
         </StoreProvider>
       </ThemeProvider>
     </BrowserRouter>

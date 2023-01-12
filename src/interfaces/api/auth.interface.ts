@@ -1,11 +1,12 @@
-import { CognitoUser } from 'amazon-cognito-identity-js';
-
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
-export interface LoginResponse extends CognitoUser {}
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+}
 
 export interface SignUpRequest {
   email: string;
@@ -13,4 +14,14 @@ export interface SignUpRequest {
   password: string;
 }
 
-export interface SignUpResponse extends CognitoUser {}
+export interface SignUpResponse {
+  verificationDestination: string;
+  verificationUsername: string;
+  isConfirmed: boolean;
+}
+
+export interface VerifyRequest {
+  verificationCode: string;
+}
+
+export interface VerifyResponse {}

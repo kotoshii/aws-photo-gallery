@@ -10,16 +10,25 @@ import {
   TextField,
   Typography,
   Button,
+  IconButton,
 } from '@mui/material';
 import z, { TypeOf } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login, signUp } from '@store/slices/auth.slice';
+import {
+  login,
+  setVerificationUsername,
+  signUp,
+  verifyAccount,
+} from '@store/slices/auth.slice';
 import { useAppDispatch } from '@store';
+import { ArrowBackOutlined } from '@mui/icons-material';
+import { AmplifyErrorTypes } from '@constants/amplify-error-types';
+import { useSnackbar } from 'notistack';
 
 enum TabValue {
-  SIGN_IN,
-  SIGN_UP,
+  SignIn,
+  SignUp,
 }
 
 const signInSchema = z
@@ -39,7 +48,10 @@ const signUpSchema = z
       .string()
       .nonempty('Email is required')
       .email('Invalid email format'),
-    password: z.string().nonempty('Password is required'),
+    password: z
+      .string()
+      .nonempty('Password is required')
+      .min(8, 'Password should be at least 8 characters long'),
     confirmPassword: z.string().nonempty('Password confirmation is required'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -47,10 +59,19 @@ const signUpSchema = z
     message: 'Passwords do not match',
   });
 
+const verifyFormSchema = z.object({
+  verificationCode: z.string().nonempty('Verification code is required'),
+});
+
 type SignInValues = TypeOf<typeof signInSchema>;
 type SignUpValues = TypeOf<typeof signUpSchema>;
+type VerifyValues = TypeOf<typeof verifyFormSchema>;
 
-function SignInForm() {
+interface FormProps {
+  setNeedsConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function SignInForm({ setNeedsConfirmation }: FormProps) {
   const {
     register,
     formState: { errors },
@@ -60,9 +81,24 @@ function SignInForm() {
     mode: 'onChange',
   });
   const dispatch = useAppDispatch();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const onSubmitClick: SubmitHandler<SignInValues> = (values) => {
-    // dispatch(login(values));
+  const onSubmitClick: SubmitHandler<SignInValues> = async (values) => {
+    try {
+      await dispatch(login(values)).unwrap();
+    } catch (e) {
+      if (e.name === AmplifyErrorTypes.UserNotConfirmed) {
+        dispatch(setVerificationUsername(values.email));
+        setNeedsConfirmation(true);
+      }
+
+      if (e.name === AmplifyErrorTypes.UserNotFound) {
+        enqueueSnackbar(e.message, {
+          variant: 'error',
+          autoHideDuration: 5000,
+        });
+      }
+    }
   };
 
   return (
@@ -105,7 +141,7 @@ function SignInForm() {
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ setNeedsConfirmation }: FormProps) {
   const {
     register,
     formState: { errors },
@@ -115,13 +151,26 @@ function SignUpForm() {
     mode: 'onChange',
   });
   const dispatch = useAppDispatch();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const onSubmitClick: SubmitHandler<SignUpValues> = ({
+  const onSubmitClick: SubmitHandler<SignUpValues> = async ({
     email,
     password,
     name,
   }) => {
-    // dispatch(signUp({ email, name, password }));
+    try {
+      const { isConfirmed } = await dispatch(
+        signUp({ email, name, password }),
+      ).unwrap();
+      setNeedsConfirmation(!isConfirmed);
+    } catch (e) {
+      if (e.name === AmplifyErrorTypes.UsernameExists) {
+        enqueueSnackbar(e.message, {
+          variant: 'error',
+          autoHideDuration: 5000,
+        });
+      }
+    }
   };
 
   return (
@@ -187,8 +236,77 @@ function SignUpForm() {
   );
 }
 
+function VerifyAccountForm({ setNeedsConfirmation }: FormProps) {
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<VerifyValues>({
+    resolver: zodResolver(verifyFormSchema),
+    mode: 'onChange',
+  });
+
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useAppDispatch();
+
+  const onSubmitClick: SubmitHandler<VerifyValues> = async (values) => {
+    try {
+      await dispatch(verifyAccount(values)).unwrap();
+      setNeedsConfirmation(false);
+    } catch (e) {
+      if (e.name === AmplifyErrorTypes.CodeMismatch) {
+        enqueueSnackbar(e.message, {
+          variant: 'error',
+          autoHideDuration: 5000,
+        });
+      }
+    }
+  };
+
+  return (
+    <>
+      <Box display="flex" alignItems="center" p={2}>
+        <IconButton onClick={() => setNeedsConfirmation(false)}>
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography ml={1} variant="h6">
+          Back to log in screen
+        </Typography>
+      </Box>
+      <Grid container rowSpacing={2} py={12} px={8}>
+        <Grid item xs={12}>
+          <Typography variant="h6">Confirm your account creation</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Verification code"
+            required
+            error={!!errors.verificationCode}
+            helperText={
+              errors.verificationCode ? errors.verificationCode.message : ''
+            }
+            {...register('verificationCode')}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            disableElevation
+            fullWidth
+            onClick={handleSubmit(onSubmitClick)}
+          >
+            verify account
+          </Button>
+        </Grid>
+      </Grid>
+    </>
+  );
+}
+
 function Authentication() {
-  const [tab, setTab] = useState<TabValue>(TabValue.SIGN_IN);
+  const [tab, setTab] = useState<TabValue>(TabValue.SignIn);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: TabValue) => {
     setTab(newValue);
@@ -198,17 +316,27 @@ function Authentication() {
     <Grid css={authPage} container>
       <Grid item xs={12} sm={8} md={7} lg={6} xl={4}>
         <Paper css={authFormCard}>
-          <Tabs
-            value={tab}
-            onChange={handleChangeTab}
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
-          >
-            <Tab value={TabValue.SIGN_IN} label="sign in" />
-            <Tab value={TabValue.SIGN_UP} label="create new account" />
-          </Tabs>
-          <Box py={12} px={8}>
-            {tab === TabValue.SIGN_IN ? <SignInForm /> : <SignUpForm />}
-          </Box>
+          {needsConfirmation ? (
+            <VerifyAccountForm setNeedsConfirmation={setNeedsConfirmation} />
+          ) : (
+            <>
+              <Tabs
+                value={tab}
+                onChange={handleChangeTab}
+                sx={{ borderBottom: 1, borderColor: 'divider' }}
+              >
+                <Tab value={TabValue.SignIn} label="sign in" />
+                <Tab value={TabValue.SignUp} label="create new account" />
+              </Tabs>
+              <Box py={12} px={8}>
+                {tab === TabValue.SignIn ? (
+                  <SignInForm setNeedsConfirmation={setNeedsConfirmation} />
+                ) : (
+                  <SignUpForm setNeedsConfirmation={setNeedsConfirmation} />
+                )}
+              </Box>
+            </>
+          )}
         </Paper>
       </Grid>
     </Grid>
