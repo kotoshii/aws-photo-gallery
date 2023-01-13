@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '@constants/app-routes';
 import { AccountSettings, Authentication, Homepage } from '@pages';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,6 +11,7 @@ import { ProtectedRoute } from '@components';
 
 function App() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const listener: HubCallback = (data) => {
@@ -20,6 +21,7 @@ function App() {
           'tokenRefresh_failure' ||
           'autoSignIn_failure':
           dispatch(resetUser());
+          navigate(AppRoutes.Auth);
           break;
       }
     };
