@@ -36,6 +36,10 @@ export const userSelector = createSelector(
   authStateSelector,
   (state) => state.user,
 );
+export const loadingSelector = createSelector(
+  authStateSelector,
+  (state) => state.loading,
+);
 
 async function fetchUserWithTokens(): Promise<LoginResponse> {
   const session = await Auth.currentSession();
@@ -131,6 +135,18 @@ const authSlice = createSlice({
     });
 
     builder.addCase(login.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(verifyAccount.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(verifyAccount.fulfilled, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(verifyAccount.rejected, (state) => {
       state.loading = false;
     });
 

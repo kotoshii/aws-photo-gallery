@@ -9,13 +9,13 @@ import {
   Box,
   TextField,
   Typography,
-  Button,
   IconButton,
 } from '@mui/material';
 import z, { TypeOf } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  loadingSelector,
   login,
   setVerificationUsername,
   signUp,
@@ -25,6 +25,8 @@ import { useAppDispatch } from '@store';
 import { ArrowBackOutlined } from '@mui/icons-material';
 import { AmplifyErrorTypes } from '@constants/amplify-error-types';
 import { useSnackbar } from 'notistack';
+import { useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
 
 enum TabValue {
   SignIn,
@@ -83,6 +85,8 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
+  const loading = useSelector(loadingSelector);
+
   const onSubmitClick: SubmitHandler<SignInValues> = async (values) => {
     try {
       await dispatch(login(values)).unwrap();
@@ -128,14 +132,15 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
         />
       </Grid>
       <Grid item xs={12}>
-        <Button
+        <LoadingButton
+          loading={loading}
           variant="contained"
           disableElevation
           fullWidth
           onClick={handleSubmit(onSubmitClick)}
         >
           Sign in
-        </Button>
+        </LoadingButton>
       </Grid>
     </Grid>
   );
@@ -152,6 +157,8 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
   });
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
+
+  const loading = useSelector(loadingSelector);
 
   const onSubmitClick: SubmitHandler<SignUpValues> = async ({
     email,
@@ -223,14 +230,15 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
         />
       </Grid>
       <Grid item xs={12}>
-        <Button
+        <LoadingButton
+          loading={loading}
           variant="contained"
           disableElevation
           fullWidth
           onClick={handleSubmit(onSubmitClick)}
         >
           Sign up
-        </Button>
+        </LoadingButton>
       </Grid>
     </Grid>
   );
@@ -248,6 +256,8 @@ function VerifyAccountForm({ setNeedsConfirmation }: FormProps) {
 
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useAppDispatch();
+
+  const loading = useSelector(loadingSelector);
 
   const onSubmitClick: SubmitHandler<VerifyValues> = async (values) => {
     try {
@@ -290,14 +300,15 @@ function VerifyAccountForm({ setNeedsConfirmation }: FormProps) {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button
+          <LoadingButton
+            loading={loading}
             variant="contained"
             disableElevation
             fullWidth
             onClick={handleSubmit(onSubmitClick)}
           >
             verify account
-          </Button>
+          </LoadingButton>
         </Grid>
       </Grid>
     </>
