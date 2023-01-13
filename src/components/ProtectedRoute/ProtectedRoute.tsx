@@ -18,7 +18,9 @@ function ProtectedRoute() {
   };
 
   useEffect(() => {
-    void fetchUser();
+    if (!isAuthenticated) {
+      void fetchUser();
+    }
   }, []);
 
   if (globalLoading) {
