@@ -1,5 +1,11 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  PayloadAction,
+} from '@reduxjs/toolkit';
+import {
+  AwsUserInfo,
   LoginRequest,
   LoginResponse,
   SignUpRequest,
@@ -9,39 +15,48 @@ import {
 } from '@interfaces/api/auth.interface';
 import { Auth } from 'aws-amplify';
 import { RootState } from '@store';
+import { User } from '@interfaces/user.interface';
 
 export interface AuthState {
   verificationDestination: string | null;
   verificationUsername: string | null;
   loading: boolean;
-  tokens: {
-    accessToken: string | null;
-    refreshToken: string | null;
-  };
+  user: User | null;
 }
 
 const initialState: AuthState = {
   verificationDestination: null,
   verificationUsername: null,
   loading: false,
-  tokens: {
-    accessToken: null,
-    refreshToken: null,
-  },
+  user: null,
 };
 
-// export const authStateSelector = (state: RootState) => state.auth;
+export const authStateSelector = (state: RootState) => state.auth;
+export const userSelector = createSelector(
+  authStateSelector,
+  (state) => state.user,
+);
+
+async function fetchUserWithTokens(): Promise<LoginResponse> {
+  const session = await Auth.currentSession();
+  const {
+    attributes: { name, sub, email },
+  }: AwsUserInfo = await Auth.currentUserInfo();
+
+  return {
+    id: sub,
+    name,
+    email,
+    accessToken: session.getAccessToken().getJwtToken(),
+    refreshToken: session.getRefreshToken().getToken(),
+  };
+}
 
 export const login = createAsyncThunk<LoginResponse, LoginRequest>(
   'auth/login',
   async ({ email, password }) => {
     await Auth.signIn(email, password);
-    const session = await Auth.currentSession();
-
-    return {
-      accessToken: session.getAccessToken().getJwtToken(),
-      refreshToken: session.getRefreshToken().getToken(),
-    };
+    return fetchUserWithTokens();
   },
 );
 
@@ -73,6 +88,13 @@ export const verifyAccount = createAsyncThunk<
   );
 });
 
+export const fetchUserData = createAsyncThunk<LoginResponse>(
+  'auth/fetchUserData',
+  async () => {
+    return fetchUserWithTokens();
+  },
+);
+
 const authSlice = createSlice({
   name: 'authentication',
   initialState,
@@ -80,19 +102,43 @@ const authSlice = createSlice({
     setVerificationUsername(state, action: PayloadAction<string>) {
       state.verificationUsername = action.payload;
     },
+    resetUser(state) {
+      state.user = null;
+    },
   },
   extraReducers: (builder) => {
+    builder.addCase(signUp.pending, (state) => {
+      state.loading = true;
+    });
+
     builder.addCase(signUp.fulfilled, (state, { payload }) => {
       state.verificationDestination = payload.verificationDestination;
       state.verificationUsername = payload.verificationUsername;
+      state.loading = false;
+    });
+
+    builder.addCase(signUp.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(login.pending, (state) => {
+      state.loading = true;
     });
 
     builder.addCase(login.fulfilled, (state, { payload }) => {
-      state.tokens.accessToken = payload.accessToken;
-      state.tokens.refreshToken = payload.refreshToken;
+      state.user = { ...payload };
+      state.loading = false;
+    });
+
+    builder.addCase(login.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(fetchUserData.fulfilled, (state, { payload }) => {
+      state.user = { ...payload };
     });
   },
 });
 
-export const { setVerificationUsername } = authSlice.actions;
+export const { setVerificationUsername, resetUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -22,7 +22,9 @@
       "@store/*": ["./src/store/*"],
       "@store": ["./src/store"],
       "@interfaces/*": ["./src/interfaces/*"],
-      "@assets/*": ["./src/assets/*"]
+      "@assets/*": ["./src/assets/*"],
+      "@components": ["./src/components"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   },
   "include": ["src"],

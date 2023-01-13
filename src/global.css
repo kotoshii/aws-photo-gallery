@@ -1,3 +1,5 @@
 html, body, #root, .App {
     height: 100%;
+    background-color: #E9ECEF;
+    margin: 0
 }

@@ -6,6 +6,9 @@ export interface LoginRequest {
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
+  name: string;
+  email: string;
+  id: string;
 }
 
 export interface SignUpRequest {
@@ -25,3 +28,14 @@ export interface VerifyRequest {
 }
 
 export interface VerifyResponse {}
+
+export interface AwsUserInfo {
+  attributes: {
+    email: string;
+    email_verified: boolean;
+    name: string;
+    sub: string;
+  };
+  id: string;
+  username: string;
+}
