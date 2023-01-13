@@ -27,6 +27,8 @@ import { AmplifyErrorTypes } from '@constants/amplify-error-types';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
+import { AppRoutes } from '@constants/app-routes';
 
 enum TabValue {
   SignIn,
@@ -71,6 +73,7 @@ type VerifyValues = TypeOf<typeof verifyFormSchema>;
 
 interface FormProps {
   setNeedsConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+  setTab?: React.Dispatch<React.SetStateAction<TabValue>>;
 }
 
 function SignInForm({ setNeedsConfirmation }: FormProps) {
@@ -84,12 +87,14 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
   });
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const loading = useSelector(loadingSelector);
 
   const onSubmitClick: SubmitHandler<SignInValues> = async (values) => {
     try {
       await dispatch(login(values)).unwrap();
+      navigate(AppRoutes.Root);
     } catch (e) {
       if (e.name === AmplifyErrorTypes.UserNotConfirmed) {
         dispatch(setVerificationUsername(values.email));
@@ -244,7 +249,7 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
   );
 }
 
-function VerifyAccountForm({ setNeedsConfirmation }: FormProps) {
+function VerifyAccountForm({ setNeedsConfirmation, setTab }: FormProps) {
   const {
     register,
     formState: { errors },
@@ -263,6 +268,9 @@ function VerifyAccountForm({ setNeedsConfirmation }: FormProps) {
     try {
       await dispatch(verifyAccount(values)).unwrap();
       setNeedsConfirmation(false);
+      if (setTab) {
+        setTab(TabValue.SignIn);
+      }
     } catch (e) {
       if (e.name === AmplifyErrorTypes.CodeMismatch) {
         enqueueSnackbar(e.message, {
@@ -328,7 +336,10 @@ function Authentication() {
       <Grid item xs={12} sm={8} md={7} lg={6} xl={4}>
         <Paper css={authFormCard}>
           {needsConfirmation ? (
-            <VerifyAccountForm setNeedsConfirmation={setNeedsConfirmation} />
+            <VerifyAccountForm
+              setNeedsConfirmation={setNeedsConfirmation}
+              setTab={setTab}
+            />
           ) : (
             <>
               <Tabs
