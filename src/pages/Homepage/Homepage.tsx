@@ -1,7 +1,10 @@
+/** @jsxImportSource @emotion/react */
 import React from 'react';
+import { Box } from '@mui/material';
+import { homepage } from './styles';
 
 function Homepage() {
-  return <div>Homepage</div>;
+  return <Box css={homepage}>Homepage</Box>;
 }
 
 export default Homepage;

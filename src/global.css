@@ -3,3 +3,8 @@ html, body, #root, .App {
     background-color: #E9ECEF;
     margin: 0
 }
+
+.App {
+    display: flex;
+    justify-content: center;
+}

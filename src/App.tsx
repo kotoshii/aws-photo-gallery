@@ -7,7 +7,7 @@ import { Hub } from 'aws-amplify';
 import { HubCallback } from '@aws-amplify/core/src/Hub';
 import { useAppDispatch } from '@store';
 import { resetUser } from '@store/slices/auth.slice';
-import { ProtectedRoute } from '@components';
+import { NavbarLayout, ProtectedRoute } from '@components';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -35,11 +35,13 @@ function App() {
       <div className="App">
         <Routes>
           <Route element={<ProtectedRoute />}>
-            <Route path={AppRoutes.Root} element={<Homepage />} />
-            <Route
-              path={AppRoutes.AccountSettings}
-              element={<AccountSettings />}
-            />
+            <Route element={<NavbarLayout />}>
+              <Route path={AppRoutes.Root} element={<Homepage />} />
+              <Route
+                path={AppRoutes.AccountSettings}
+                element={<AccountSettings />}
+              />
+            </Route>
           </Route>
           <Route path={AppRoutes.Auth} element={<Authentication />} />
         </Routes>
