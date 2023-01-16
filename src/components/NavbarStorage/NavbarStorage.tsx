@@ -5,6 +5,7 @@ import { Avatar, Box, Button, TextField } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { avatarWrapper, filterButton, uploadButton } from './styles';
 import { userSelector } from '@store/slices/auth.slice';
 import { useSelector } from 'react-redux';
@@ -24,6 +25,11 @@ function NavbarStorage() {
       />
       <ActionIconButton
         icon={<FavoriteIcon />}
+        onClick={() => {}}
+        css={filterButton}
+      />
+      <ActionIconButton
+        icon={<CloudDownloadIcon />}
         onClick={() => {}}
         css={filterButton}
       />
