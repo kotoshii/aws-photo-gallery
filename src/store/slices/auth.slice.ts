@@ -99,6 +99,10 @@ export const fetchUserData = createAsyncThunk<LoginResponse>(
   },
 );
 
+export const signOut = createAsyncThunk('auth/signOut', async () => {
+  await Auth.signOut();
+});
+
 const authSlice = createSlice({
   name: 'authentication',
   initialState,
@@ -152,6 +156,18 @@ const authSlice = createSlice({
 
     builder.addCase(fetchUserData.fulfilled, (state, { payload }) => {
       state.user = { ...payload };
+    });
+
+    builder.addCase(signOut.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(signOut.fulfilled, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(signOut.rejected, (state) => {
+      state.loading = false;
     });
   },
 });

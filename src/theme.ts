@@ -23,5 +23,19 @@ export const theme = createTheme({
         },
       },
     },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          boxShadow: '0 0 4px rgba(0, 0, 0, 0.25)',
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
   },
 });

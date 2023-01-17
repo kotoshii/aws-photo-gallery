@@ -5,3 +5,4 @@ export { default as NavbarSettings } from './NavbarSettings/NavbarSettings';
 export { default as NavbarLayout } from './NavbarLayout/NavbarLayout';
 export { default as ActionIconButton } from './ActionIconButton/ActionIconButton';
 export { default as Pagination } from './Pagination/Pagination';
+export { default as ProfileMenu } from './ProfileMenu/ProfileMenu';
