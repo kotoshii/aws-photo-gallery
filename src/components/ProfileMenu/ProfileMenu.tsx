@@ -23,9 +23,10 @@ import { useSelector } from 'react-redux';
 
 interface ProfileMenuProps {
   user: User;
+  handleProfileMenuClose: () => void;
 }
 
-function ProfileMenu({ user }: ProfileMenuProps) {
+function ProfileMenu({ user, handleProfileMenuClose }: ProfileMenuProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -36,6 +37,7 @@ function ProfileMenu({ user }: ProfileMenuProps) {
   };
 
   const handleAccountSettingsClick = () => {
+    handleProfileMenuClose();
     navigate(AppRoutes.AccountSettings);
   };
 
