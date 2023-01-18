@@ -1,16 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import { Avatar, Box, Popover } from '@mui/material';
-import { ProfileMenu } from '@components';
+import { Box, Popover } from '@mui/material';
+import { ProfileMenu, UserAvatar } from '@components';
 import { avatar, avatarWrapper, popover } from './styles';
-import { useSelector } from 'react-redux';
-import { userSelector } from '@store/slices/auth.slice';
-import { User } from '@interfaces/user.interface';
 
 function ExpandableAvatarProfile() {
   const [profileMenuAnchor, setProfileMenuAnchor] =
     React.useState<null | HTMLElement>(null);
-  const user = useSelector(userSelector) as User;
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setProfileMenuAnchor(event.currentTarget);
@@ -23,7 +19,7 @@ function ExpandableAvatarProfile() {
   return (
     <>
       <Box onClick={handleAvatarClick} css={avatarWrapper}>
-        <Avatar alt={user?.name} css={avatar} />
+        <UserAvatar css={avatar} />
       </Box>
       <Popover
         css={popover}
@@ -40,10 +36,7 @@ function ExpandableAvatarProfile() {
         onClose={handleProfileMenuClose}
         elevation={0}
       >
-        <ProfileMenu
-          user={user}
-          handleProfileMenuClose={handleProfileMenuClose}
-        />
+        <ProfileMenu handleProfileMenuClose={handleProfileMenuClose} />
       </Popover>
     </>
   );

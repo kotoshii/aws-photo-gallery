@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
 import {
-  Avatar,
   CircularProgress,
   Divider,
   ListItemIcon,
@@ -17,20 +16,25 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@store';
-import { loadingSelector, signOut } from '@store/slices/auth.slice';
+import {
+  loadingSelector,
+  signOut,
+  userSelector,
+} from '@store/slices/auth.slice';
 import { AppRoutes } from '@constants/app-routes';
 import { useSelector } from 'react-redux';
+import { UserAvatar } from '@components';
 
 interface ProfileMenuProps {
-  user: User;
   handleProfileMenuClose: () => void;
 }
 
-function ProfileMenu({ user, handleProfileMenuClose }: ProfileMenuProps) {
+function ProfileMenu({ handleProfileMenuClose }: ProfileMenuProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const loading = useSelector(loadingSelector);
+  const user = useSelector(userSelector) as User;
 
   const handleLogOutClick = () => {
     dispatch(signOut());
@@ -43,12 +47,12 @@ function ProfileMenu({ user, handleProfileMenuClose }: ProfileMenuProps) {
 
   return (
     <Paper css={profileMenu} elevation={0}>
-      <Avatar alt={user?.name} css={profileMenuAvatar} />
+      <UserAvatar css={profileMenuAvatar} />
       <Typography variant="h5" mt={3}>
-        {user?.name}
+        {user.name}
       </Typography>
       <Typography variant="caption" mt={0.5}>
-        {user?.email}
+        {user.email}
       </Typography>
       <Divider css={divider} />
       <MenuList css={menuList}>
