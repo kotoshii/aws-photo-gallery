@@ -1,8 +1,24 @@
 import React from 'react';
-import { NavbarEmpty } from '@components';
+import { NavbarEmpty, ExpandableAvatarProfile } from '@components';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { IconButton, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { AppRoutes } from '@constants/app-routes';
 
 function NavbarSettings() {
-  return <NavbarEmpty></NavbarEmpty>;
+  const navigate = useNavigate();
+
+  return (
+    <NavbarEmpty>
+      <IconButton onClick={() => navigate(AppRoutes.Root)}>
+        <ArrowBackIcon />
+      </IconButton>
+      <Typography variant="h6" ml={2}>
+        Back to storage
+      </Typography>
+      <ExpandableAvatarProfile />
+    </NavbarEmpty>
+  );
 }
 
 export default NavbarSettings;
