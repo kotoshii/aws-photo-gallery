@@ -10,4 +10,5 @@ export const navbarEmpty = css`
   padding: 0 24px;
   display: flex;
   align-items: center;
+  z-index: 999;
 `;
