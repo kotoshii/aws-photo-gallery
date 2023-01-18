@@ -10,12 +10,12 @@ export const profileMenu = css`
   align-items: center;
   width: 315px;
   padding: 16px;
+  background-color: #f8f9fa;
 `;
 
 export const divider = css`
   margin-top: 24px;
   margin-bottom: 16px;
-  width: 100%;
 `;
 
 export const menuList = css`

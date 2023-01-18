@@ -54,7 +54,7 @@ function ProfileMenu({ handleProfileMenuClose }: ProfileMenuProps) {
       <Typography variant="caption" mt={0.5}>
         {user.email}
       </Typography>
-      <Divider css={divider} />
+      <Divider css={divider} flexItem />
       <MenuList css={menuList}>
         <MenuItem onClick={handleAccountSettingsClick}>
           <ListItemIcon>
