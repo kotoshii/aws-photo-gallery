@@ -9,9 +9,9 @@ function NavbarLayout() {
   const matchSettings = useMatch(AppRoutes.AccountSettings);
 
   const navbar = useMemo(() => {
-    if (matchRoot) return <NavbarStorage />;
     if (matchSettings) return <NavbarSettings />;
-  }, []);
+    if (matchRoot) return <NavbarStorage />;
+  }, [matchRoot, matchSettings]);
 
   return (
     <>
