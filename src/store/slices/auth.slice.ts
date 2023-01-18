@@ -7,15 +7,18 @@ import {
 import {
   AwsUserInfo,
   LoginRequest,
-  LoginResponse,
+  UserDataWithTokens,
   SignUpRequest,
   SignUpResponse,
+  UpdateAttributesRequest,
+  UpdateAttributesResponse,
   VerifyRequest,
   VerifyResponse,
 } from '@interfaces/api/auth.interface';
 import { Auth } from 'aws-amplify';
 import { RootState } from '@store';
 import { User } from '@interfaces/user.interface';
+import { CognitoUser } from 'amazon-cognito-identity-js';
 
 export interface AuthState {
   verificationDestination: string | null;
@@ -41,7 +44,7 @@ export const loadingSelector = createSelector(
   (state) => state.loading,
 );
 
-async function fetchUserWithTokens(): Promise<LoginResponse> {
+async function fetchUserWithTokens(): Promise<UserDataWithTokens> {
   const session = await Auth.currentSession();
   const {
     attributes: { name, sub, email },
@@ -56,7 +59,7 @@ async function fetchUserWithTokens(): Promise<LoginResponse> {
   };
 }
 
-export const login = createAsyncThunk<LoginResponse, LoginRequest>(
+export const login = createAsyncThunk<UserDataWithTokens, LoginRequest>(
   'auth/login',
   async ({ email, password }) => {
     await Auth.signIn(email, password);
@@ -92,7 +95,7 @@ export const verifyAccount = createAsyncThunk<
   );
 });
 
-export const fetchUserData = createAsyncThunk<LoginResponse>(
+export const fetchUserData = createAsyncThunk<UserDataWithTokens>(
   'auth/fetchUserData',
   async () => {
     return fetchUserWithTokens();
@@ -101,6 +104,17 @@ export const fetchUserData = createAsyncThunk<LoginResponse>(
 
 export const signOut = createAsyncThunk('auth/signOut', async () => {
   await Auth.signOut();
+});
+
+export const updateUserAttributes = createAsyncThunk<
+  UpdateAttributesResponse,
+  UpdateAttributesRequest
+>('auth/updateUserAttributes', async (attrs) => {
+  const user: CognitoUser = await Auth.currentAuthenticatedUser();
+  await Auth.updateUserAttributes(user, attrs);
+  const { attributes }: AwsUserInfo = await Auth.currentUserInfo();
+
+  return attributes;
 });
 
 const authSlice = createSlice({
@@ -167,6 +181,22 @@ const authSlice = createSlice({
     });
 
     builder.addCase(signOut.rejected, (state) => {
+      state.loading = false;
+    });
+
+    builder.addCase(updateUserAttributes.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(
+      updateUserAttributes.fulfilled,
+      (state, { payload: { name } }) => {
+        state.loading = false;
+        (state.user as User).name = name;
+      },
+    );
+
+    builder.addCase(updateUserAttributes.rejected, (state) => {
       state.loading = false;
     });
   },

@@ -3,7 +3,7 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
+export interface UserDataWithTokens {
   accessToken: string;
   refreshToken: string;
   name: string;
@@ -38,4 +38,12 @@ export interface AwsUserInfo {
   };
   id: string;
   username: string;
+}
+
+export interface UpdateAttributesRequest {
+  name?: string;
+}
+
+export interface UpdateAttributesResponse {
+  name: string;
 }

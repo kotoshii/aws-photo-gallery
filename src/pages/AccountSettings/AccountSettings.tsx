@@ -9,8 +9,22 @@ import {
   uploadAvatarButton,
 } from './styles';
 import { UserAvatar } from '@components';
+import { useAppDispatch } from '@store';
+import {
+  loadingSelector,
+  updateUserAttributes,
+} from '@store/slices/auth.slice';
+import { useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
 
 function AccountSettings() {
+  const dispatch = useAppDispatch();
+  const loading = useSelector(loadingSelector);
+
+  const handleSaveNameClick = () => {
+    dispatch(updateUserAttributes({ name: 'Test Test 3' }));
+  };
+
   return (
     <Grid container css={accountSettingsPage}>
       <Grid item xs={12} sm={12} md={6} lg={6} xl={4} mx="auto">
@@ -25,9 +39,15 @@ function AccountSettings() {
               <TextField label="Name" fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <Button variant="contained" disableElevation fullWidth>
+              <LoadingButton
+                loading={loading}
+                variant="contained"
+                disableElevation
+                fullWidth
+                onClick={handleSaveNameClick}
+              >
                 save name
-              </Button>
+              </LoadingButton>
             </Grid>
           </Grid>
           <Divider flexItem css={divider} />
