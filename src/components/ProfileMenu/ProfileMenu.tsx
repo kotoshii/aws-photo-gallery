@@ -47,7 +47,7 @@ function ProfileMenu({ handleProfileMenuClose }: ProfileMenuProps) {
 
   return (
     <Paper css={profileMenu} elevation={0}>
-      <UserAvatar css={profileMenuAvatar} />
+      <UserAvatar css={profileMenuAvatar} size={140} />
       <Typography variant="h5" mt={3}>
         {user.name}
       </Typography>

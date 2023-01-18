@@ -6,11 +6,18 @@ import { User } from '@interfaces/user.interface';
 
 interface UserAvatarProps {
   className?: string;
+  size?: number | string;
 }
 
-function UserAvatar({ className }: UserAvatarProps) {
+function UserAvatar({ className, size }: UserAvatarProps) {
   const user = useSelector(userSelector) as User;
-  return <Avatar alt={user.name} className={className} />;
+  return (
+    <Avatar
+      alt={user.name}
+      className={className}
+      sx={{ width: size, height: size }}
+    />
+  );
 }
 
 export default UserAvatar;

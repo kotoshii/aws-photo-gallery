@@ -1,8 +1,6 @@
 import { css } from '@emotion/react';
 
 export const profileMenuAvatar = css`
-  width: 140px;
-  height: 140px;
   margin-top: 32px;
 `;
 
