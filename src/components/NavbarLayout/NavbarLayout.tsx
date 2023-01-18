@@ -1,8 +1,10 @@
+/** @jsxImportSource @emotion/react */
 import React, { useMemo } from 'react';
 import { Outlet, useMatch } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { AppRoutes } from '@constants/app-routes';
 import { NavbarStorage, NavbarSettings } from '@components';
+import { navbarLayout } from './styles';
 
 function NavbarLayout() {
   const matchRoot = useMatch(AppRoutes.Root);
@@ -16,7 +18,7 @@ function NavbarLayout() {
   return (
     <>
       {navbar}
-      <Box px={4} height={1} width={1} overflow="auto">
+      <Box px={4} height={1} width={1} overflow="auto" css={navbarLayout}>
         <Outlet />
       </Box>
     </>
