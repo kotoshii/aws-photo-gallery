@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavbarEmpty, ExpandableAvatarProfile } from '@components';
+import { NavbarEmpty } from '@components';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ function NavbarSettings() {
       <Typography variant="h6" ml={2}>
         Back to storage
       </Typography>
-      <ExpandableAvatarProfile />
     </NavbarEmpty>
   );
 }
