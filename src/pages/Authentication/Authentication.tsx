@@ -101,8 +101,11 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
         setNeedsConfirmation(true);
       }
 
-      if (e.name === AmplifyErrorTypes.UserNotFound) {
-        enqueueSnackbar(e.message, {
+      if (
+        e.name === AmplifyErrorTypes.UserNotFound ||
+        e.name === AmplifyErrorTypes.NotAuthorized
+      ) {
+        enqueueSnackbar('Incorrect username or password.', {
           variant: 'error',
           autoHideDuration: 5000,
         });
@@ -121,7 +124,7 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
           label="Email address"
           required
           error={!!errors.email}
-          helperText={errors.email ? errors.email.message : ''}
+          helperText={errors.email?.message}
           {...register('email')}
         />
       </Grid>
@@ -132,7 +135,7 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
           type="password"
           required
           error={!!errors.password}
-          helperText={errors.password ? errors.password.message : ''}
+          helperText={errors.password?.message}
           {...register('password')}
         />
       </Grid>
@@ -196,7 +199,7 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
           label="Name"
           required
           error={!!errors.name}
-          helperText={errors.name ? errors.name.message : ''}
+          helperText={errors.name?.message}
           {...register('name')}
         />
       </Grid>
@@ -206,7 +209,7 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
           label="Email address"
           required
           error={!!errors.email}
-          helperText={errors.email ? errors.email.message : ''}
+          helperText={errors.email?.message}
           {...register('email')}
         />
       </Grid>
@@ -217,7 +220,7 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
           type="password"
           required
           error={!!errors.password}
-          helperText={errors.password ? errors.password.message : ''}
+          helperText={errors.password?.message}
           {...register('password')}
         />
       </Grid>
@@ -228,9 +231,7 @@ function SignUpForm({ setNeedsConfirmation }: FormProps) {
           label="Confirm password"
           required
           error={!!errors.confirmPassword}
-          helperText={
-            errors.confirmPassword ? errors.confirmPassword.message : ''
-          }
+          helperText={errors.confirmPassword?.message}
           {...register('confirmPassword')}
         />
       </Grid>
@@ -301,9 +302,7 @@ function VerifyAccountForm({ setNeedsConfirmation, setTab }: FormProps) {
             label="Verification code"
             required
             error={!!errors.verificationCode}
-            helperText={
-              errors.verificationCode ? errors.verificationCode.message : ''
-            }
+            helperText={errors.verificationCode?.message}
             {...register('verificationCode')}
           />
         </Grid>
