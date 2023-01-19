@@ -1,3 +1,4 @@
+import type {} from '@mui/x-date-pickers/themeAugmentation';
 import { createTheme } from '@mui/material';
 
 export const theme = createTheme({

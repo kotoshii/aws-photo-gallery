@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ActionIconButton,
   NavbarEmpty,
   Pagination,
   ExpandableAvatarProfile,
+  FiltersDropdown,
 } from '@components';
 import { Button, TextField } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -12,25 +13,59 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { filterButton, uploadButton } from './styles';
+import { useAppDispatch } from '@store';
+import {
+  showFavoritesSelector,
+  showOfflineSelector,
+  toggleShowFavorites,
+  toggleShowOffline,
+} from '@store/slices/files.slice';
+import { useSelector } from 'react-redux';
 
 function NavbarStorage() {
+  const dispatch = useAppDispatch();
+  const [filtersDropdownAnchor, setFiltersDropdownAnchor] =
+    useState<HTMLElement | null>(null);
+
+  const showFavorites = useSelector(showFavoritesSelector);
+  const showOffline = useSelector(showOfflineSelector);
+
+  const handleFiltersClick = (event: React.MouseEvent<HTMLElement>) => {
+    setFiltersDropdownAnchor(event.currentTarget);
+  };
+
+  const handleFavoritesClick = () => {
+    dispatch(toggleShowFavorites());
+  };
+
+  const handleOfflineClick = () => {
+    dispatch(toggleShowOffline());
+  };
+
+  const handleFiltersDropdownClose = () => {
+    setFiltersDropdownAnchor(null);
+  };
+
   return (
     <NavbarEmpty>
       <TextField placeholder="Search..." sx={{ width: 400 }} />
       <ActionIconButton
         icon={<FilterAltIcon />}
-        onClick={() => {}}
+        onClick={handleFiltersClick}
         css={filterButton}
+        active={!!filtersDropdownAnchor}
       />
       <ActionIconButton
         icon={<FavoriteIcon />}
-        onClick={() => {}}
+        onClick={handleFavoritesClick}
         css={filterButton}
+        active={showFavorites}
       />
       <ActionIconButton
         icon={<CloudDownloadIcon />}
-        onClick={() => {}}
+        onClick={handleOfflineClick}
         css={filterButton}
+        active={showOffline}
       />
       <Pagination />
       <Button
@@ -42,6 +77,10 @@ function NavbarStorage() {
         upload new file
       </Button>
       <ExpandableAvatarProfile />
+      <FiltersDropdown
+        anchorEl={filtersDropdownAnchor}
+        onClose={handleFiltersDropdownClose}
+      />
     </NavbarEmpty>
   );
 }

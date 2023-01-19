@@ -8,3 +8,4 @@ export { default as Pagination } from './Pagination/Pagination';
 export { default as ProfileMenu } from './ProfileMenu/ProfileMenu';
 export { default as ExpandableAvatarProfile } from './ExpandableAvatarProfile/ExpandableAvatarProfile';
 export { default as UserAvatar } from './UserAvatar/UserAvatar';
+export { default as FiltersDropdown } from './FiltersDropdown/FiltersDropdown';
