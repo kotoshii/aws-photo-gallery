@@ -7,12 +7,14 @@ import { User } from '@interfaces/user.interface';
 interface UserAvatarProps {
   className?: string;
   size?: number | string;
+  src?: string;
 }
 
-function UserAvatar({ className, size }: UserAvatarProps) {
+function UserAvatar({ className, size, src }: UserAvatarProps) {
   const user = useSelector(userSelector) as User;
   return (
     <Avatar
+      src={src}
       alt={user.name}
       className={className}
       sx={{ width: size, height: size }}

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { Button, Divider, Grid, Paper, TextField } from '@mui/material';
 import {
   accountSettings,
@@ -211,13 +211,45 @@ function ChangePasswordForm() {
 }
 
 function AccountSettings() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [avatarPreviewSrc, setAvatarPreviewSrc] = useState<string>();
+
+  const handleUploadAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setAvatarPreviewSrc(reader.result as string);
+      });
+
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Grid container css={accountSettingsPage}>
       <Grid item xs={12} sm={12} md={6} lg={6} xl={4} mx="auto">
         <Paper elevation={0} css={accountSettings}>
-          <UserAvatar size={140} css={avatar} />
-          <Button variant="contained" disableElevation css={uploadAvatarButton}>
+          <UserAvatar size={140} css={avatar} src={avatarPreviewSrc} />
+          <Button
+            variant="contained"
+            disableElevation
+            css={uploadAvatarButton}
+            onClick={handleUploadAvatarClick}
+          >
             change profile pic
+            <input
+              ref={fileInputRef}
+              type="file"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
           </Button>
           <Divider flexItem css={divider} />
           <UpdateNameForm />
