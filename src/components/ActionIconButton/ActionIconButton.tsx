@@ -1,17 +1,27 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import { actionIconButton } from './styles';
+import { actionButtonActive, actionIconButton } from './styles';
 import { IconButton } from '@mui/material';
 
 interface ActionIconButtonProps {
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLElement>) => void;
   className?: string;
+  active?: boolean;
 }
 
-function ActionIconButton({ icon, onClick, className }: ActionIconButtonProps) {
+function ActionIconButton({
+  icon,
+  onClick,
+  className,
+  active,
+}: ActionIconButtonProps) {
   return (
-    <IconButton css={actionIconButton} onClick={onClick} className={className}>
+    <IconButton
+      css={[actionIconButton, active ? actionButtonActive : null]}
+      onClick={onClick}
+      className={className}
+    >
       {icon}
     </IconButton>
   );
