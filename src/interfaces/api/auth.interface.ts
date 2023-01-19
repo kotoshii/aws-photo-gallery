@@ -47,3 +47,8 @@ export interface UpdateAttributesRequest {
 export interface UpdateAttributesResponse {
   name: string;
 }
+
+export interface UpdatePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}

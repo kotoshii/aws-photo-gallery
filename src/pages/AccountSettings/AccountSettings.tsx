@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Divider, Grid, Paper, TextField } from '@mui/material';
 import {
   accountSettings,
@@ -11,20 +11,206 @@ import {
 import { UserAvatar } from '@components';
 import { useAppDispatch } from '@store';
 import {
-  loadingSelector,
+  updatePassword,
   updateUserAttributes,
+  userSelector,
 } from '@store/slices/auth.slice';
-import { useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
+import z, { TypeOf } from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod/dist/zod';
+import { useSnackbar } from 'notistack';
+import { useSelector } from 'react-redux';
+import { User } from '@interfaces/user.interface';
+import { AmplifyErrorTypes } from '@constants/amplify-error-types';
 
-function AccountSettings() {
+const updateNameSchema = z.object({
+  name: z.string().nonempty(),
+});
+
+const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().nonempty('This field is required'),
+    newPassword: z
+      .string()
+      .nonempty('This field is required')
+      .min(8, 'Password should be at least 8 characters long'),
+    confirmNewPassword: z
+      .string()
+      .nonempty('This field is required')
+      .min(8, 'Password should be at least 8 characters long'),
+  })
+  .required()
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    path: ['confirmNewPassword'],
+    message: 'Passwords do not match',
+  });
+
+type UpdateNameValues = TypeOf<typeof updateNameSchema>;
+type ChangePassValues = TypeOf<typeof changePasswordSchema>;
+
+function UpdateNameForm() {
   const dispatch = useAppDispatch();
-  const loading = useSelector(loadingSelector);
+  const [loading, setLoading] = useState(false);
+  const user = useSelector(userSelector) as User;
 
-  const handleSaveNameClick = () => {
-    dispatch(updateUserAttributes({ name: 'Test Test 3' }));
+  const { enqueueSnackbar } = useSnackbar();
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<UpdateNameValues>({
+    resolver: zodResolver(updateNameSchema),
+    mode: 'onChange',
+    defaultValues: { name: user.name },
+  });
+
+  const handleSaveNameClick: SubmitHandler<UpdateNameValues> = async ({
+    name,
+  }) => {
+    try {
+      setLoading(true);
+      await dispatch(updateUserAttributes({ name })).unwrap();
+      setLoading(false);
+
+      enqueueSnackbar('All changes saved!', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+    } catch (e) {
+      setLoading(false);
+      enqueueSnackbar(`Something went wrong. Server response: ${e.message}`, {
+        variant: 'error',
+        autoHideDuration: 5000,
+      });
+    }
   };
 
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <TextField
+          fullWidth
+          label="Name"
+          error={!!errors.name}
+          {...register('name')}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <LoadingButton
+          disabled={!!errors.name}
+          loading={loading}
+          variant="contained"
+          disableElevation
+          fullWidth
+          onClick={handleSubmit(handleSaveNameClick)}
+        >
+          save name
+        </LoadingButton>
+      </Grid>
+    </Grid>
+  );
+}
+
+function ChangePasswordForm() {
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<ChangePassValues>({
+    resolver: zodResolver(changePasswordSchema),
+    mode: 'onChange',
+  });
+
+  const handleChangePasswordClick: SubmitHandler<ChangePassValues> = async ({
+    oldPassword,
+    newPassword,
+  }) => {
+    try {
+      setLoading(true);
+      await dispatch(updatePassword({ oldPassword, newPassword })).unwrap();
+      setLoading(false);
+
+      enqueueSnackbar('All changes saved!', {
+        variant: 'success',
+        autoHideDuration: 3000,
+      });
+    } catch (e) {
+      setLoading(false);
+
+      if (e.name === AmplifyErrorTypes.NotAuthorized) {
+        enqueueSnackbar('Incorrect old password', {
+          variant: 'error',
+          autoHideDuration: 5000,
+        });
+      }
+
+      if (e.name === AmplifyErrorTypes.InvalidParameter) {
+        enqueueSnackbar(
+          'Something went wrong. Make sure you filled the fields properly.',
+          {
+            variant: 'error',
+            autoHideDuration: 5000,
+          },
+        );
+      }
+    }
+  };
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <TextField
+          type="password"
+          label="Old password"
+          fullWidth
+          error={!!errors.oldPassword}
+          helperText={errors.oldPassword?.message}
+          {...register('oldPassword')}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          type="password"
+          label="New password"
+          fullWidth
+          error={!!errors.newPassword}
+          helperText={errors.newPassword?.message}
+          {...register('newPassword')}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          type="password"
+          label="Confirm new password"
+          fullWidth
+          error={!!errors.confirmNewPassword}
+          helperText={errors.confirmNewPassword?.message}
+          {...register('confirmNewPassword')}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <LoadingButton
+          loading={loading}
+          variant="contained"
+          disableElevation
+          fullWidth
+          onClick={handleSubmit(handleChangePasswordClick)}
+        >
+          update password
+        </LoadingButton>
+      </Grid>
+    </Grid>
+  );
+}
+
+function AccountSettings() {
   return (
     <Grid container css={accountSettingsPage}>
       <Grid item xs={12} sm={12} md={6} lg={6} xl={4} mx="auto">
@@ -34,39 +220,9 @@ function AccountSettings() {
             change profile pic
           </Button>
           <Divider flexItem css={divider} />
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField label="Name" fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <LoadingButton
-                loading={loading}
-                variant="contained"
-                disableElevation
-                fullWidth
-                onClick={handleSaveNameClick}
-              >
-                save name
-              </LoadingButton>
-            </Grid>
-          </Grid>
+          <UpdateNameForm />
           <Divider flexItem css={divider} />
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField label="Old password" fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label="New password" fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label="Confirm new password" fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" disableElevation fullWidth>
-                update password
-              </Button>
-            </Grid>
-          </Grid>
+          <ChangePasswordForm />
         </Paper>
       </Grid>
     </Grid>

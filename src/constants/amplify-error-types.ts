@@ -3,4 +3,6 @@ export enum AmplifyErrorTypes {
   CodeMismatch = 'CodeMismatchException',
   UsernameExists = 'UsernameExistsException',
   UserNotFound = 'UserNotFoundException',
+  NotAuthorized = 'NotAuthorizedException',
+  InvalidParameter = 'InvalidParameterException',
 }

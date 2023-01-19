@@ -14,6 +14,7 @@ import {
   UpdateAttributesResponse,
   VerifyRequest,
   VerifyResponse,
+  UpdatePasswordRequest,
 } from '@interfaces/api/auth.interface';
 import { Auth } from 'aws-amplify';
 import { RootState } from '@store';
@@ -116,6 +117,14 @@ export const updateUserAttributes = createAsyncThunk<
 
   return attributes;
 });
+
+export const updatePassword = createAsyncThunk<unknown, UpdatePasswordRequest>(
+  'auth/updatePassword',
+  async ({ oldPassword, newPassword }) => {
+    const user: CognitoUser = await Auth.currentAuthenticatedUser();
+    await Auth.changePassword(user, oldPassword, newPassword);
+  },
+);
 
 const authSlice = createSlice({
   name: 'authentication',
