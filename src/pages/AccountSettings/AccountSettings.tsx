@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, useRef, useState } from 'react';
-import { Button, Divider, Grid, Paper, TextField } from '@mui/material';
+import { Divider, Grid, Paper, TextField } from '@mui/material';
 import {
   accountSettings,
   accountSettingsPage,
@@ -23,6 +23,7 @@ import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import { User } from '@interfaces/user.interface';
 import { AmplifyErrorTypes } from '@constants/amplify-error-types';
+import { updateUserAvatar } from '@store/slices/files.slice';
 
 const updateNameSchema = z.object({
   name: z.string().nonempty(),
@@ -212,23 +213,33 @@ function ChangePasswordForm() {
 
 function AccountSettings() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [avatarPreviewSrc, setAvatarPreviewSrc] = useState<string>();
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useAppDispatch();
 
   const handleUploadAvatarClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const uploadAvatar = async (file: File) => {
+    try {
+      setUploadingAvatar(true);
+      await dispatch(updateUserAvatar(file)).unwrap();
+      setUploadingAvatar(false);
+    } catch (e) {
+      enqueueSnackbar('Something went wrong. Try again later.', {
+        variant: 'error',
+        autoHideDuration: 5000,
+      });
+    }
+  };
+
+  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
 
     if (file) {
-      const reader = new FileReader();
-      reader.addEventListener('load', () => {
-        setAvatarPreviewSrc(reader.result as string);
-      });
-
-      reader.readAsDataURL(file);
+      void uploadAvatar(file);
     }
   };
 
@@ -236,12 +247,13 @@ function AccountSettings() {
     <Grid container css={accountSettingsPage}>
       <Grid item xs={12} sm={12} md={6} lg={6} xl={4} mx="auto">
         <Paper elevation={0} css={accountSettings}>
-          <UserAvatar size={140} css={avatar} src={avatarPreviewSrc} />
-          <Button
+          <UserAvatar size={140} css={avatar} />
+          <LoadingButton
             variant="contained"
             disableElevation
             css={uploadAvatarButton}
             onClick={handleUploadAvatarClick}
+            loading={uploadingAvatar}
           >
             change profile pic
             <input
@@ -250,7 +262,7 @@ function AccountSettings() {
               style={{ display: 'none' }}
               onChange={handleAvatarChange}
             />
-          </Button>
+          </LoadingButton>
           <Divider flexItem css={divider} />
           <UpdateNameForm />
           <Divider flexItem css={divider} />

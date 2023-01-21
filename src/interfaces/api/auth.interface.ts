@@ -6,6 +6,7 @@ export interface LoginRequest {
 export interface UserDataWithTokens {
   accessToken: string;
   refreshToken: string;
+  avatar: string | null;
   name: string;
   email: string;
   id: string;

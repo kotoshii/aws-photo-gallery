@@ -16,10 +16,11 @@ import {
   VerifyResponse,
   UpdatePasswordRequest,
 } from '@interfaces/api/auth.interface';
-import { Auth, DataStore } from 'aws-amplify';
+import { Auth, Storage } from 'aws-amplify';
 import { RootState } from '@store';
 import { User } from '@interfaces/user.interface';
 import { CognitoUser } from 'amazon-cognito-identity-js';
+import { updateUserAvatar } from '@store/slices/files.slice';
 
 export interface AuthState {
   verificationDestination: string | null;
@@ -51,12 +52,17 @@ async function fetchUserWithTokens(): Promise<UserDataWithTokens> {
     attributes: { name, sub, email },
   }: AwsUserInfo = await Auth.currentUserInfo();
 
+  const { results } = await Storage.list('avatar.jpg');
+  const avatarKey = results[0]?.key;
+  const avatar = avatarKey ? await Storage.get(avatarKey) : null;
+
   return {
     id: sub,
     name,
     email,
     accessToken: session.getAccessToken().getJwtToken(),
     refreshToken: session.getRefreshToken().getToken(),
+    avatar,
   };
 }
 
@@ -207,6 +213,10 @@ const authSlice = createSlice({
 
     builder.addCase(updateUserAttributes.rejected, (state) => {
       state.loading = false;
+    });
+
+    builder.addCase(updateUserAvatar.fulfilled, (state, { payload }) => {
+      (state.user as User).avatar = payload;
     });
   },
 });
