@@ -16,7 +16,7 @@ import {
   VerifyResponse,
   UpdatePasswordRequest,
 } from '@interfaces/api/auth.interface';
-import { Auth } from 'aws-amplify';
+import { Auth, DataStore } from 'aws-amplify';
 import { RootState } from '@store';
 import { User } from '@interfaces/user.interface';
 import { CognitoUser } from 'amazon-cognito-identity-js';
