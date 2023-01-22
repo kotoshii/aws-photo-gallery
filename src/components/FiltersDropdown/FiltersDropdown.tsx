@@ -13,7 +13,7 @@ import { applyButton, popover } from './styles';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { filesize } from 'filesize';
-import { FIFTY_MB } from '@constants/file-sizes';
+import { FIFTY_MB } from '@constants/common';
 import { useAppDispatch } from '@store';
 import { filtersSelector, setFilesFilters } from '@store/slices/files.slice';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';

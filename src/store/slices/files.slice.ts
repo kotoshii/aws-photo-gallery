@@ -7,7 +7,7 @@ import {
 import { RootState } from '@store';
 import { FileObj } from '@interfaces/file.interface';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
-import { FIFTY_MB } from '@constants/file-sizes';
+import { FIFTY_MB } from '@constants/common';
 import { Storage } from 'aws-amplify';
 
 export interface FilesState {
