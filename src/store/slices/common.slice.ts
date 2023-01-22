@@ -1,6 +1,6 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '@store';
-import { fetchUserData } from '@store/slices/auth.slice';
+import { fetchUserData, login } from '@store/slices/auth.slice';
 
 export interface CommonState {
   globalLoading: boolean;
@@ -30,6 +30,10 @@ const commonSlice = createSlice({
     });
 
     builder.addCase(fetchUserData.rejected, (state) => {
+      state.globalLoading = false;
+    });
+
+    builder.addCase(login.fulfilled, (state) => {
       state.globalLoading = false;
     });
   },
