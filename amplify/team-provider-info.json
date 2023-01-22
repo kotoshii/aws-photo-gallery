@@ -14,6 +14,9 @@
     "categories": {
       "auth": {
         "awsphotogallery72c47f2a": {}
+      },
+      "storage": {
+        "s3awsphotogallerystorage0551dbd2": {}
       }
     }
   }
