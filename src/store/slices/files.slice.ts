@@ -15,6 +15,7 @@ export interface FilesState {
   showOffline: boolean;
   data: FileObj[];
   filters: FileFilters;
+  page: number;
 }
 
 const initialState: FilesState = {
@@ -27,6 +28,7 @@ const initialState: FilesState = {
     sizeTo: FIFTY_MB,
   },
   data: [],
+  page: 1,
 };
 
 export const filesStateSelector = (state: RootState) => state.files;
@@ -41,6 +43,10 @@ export const showFavoritesSelector = createSelector(
 export const showOfflineSelector = createSelector(
   filesStateSelector,
   (state) => state.showOffline,
+);
+export const pageSelector = createSelector(
+  filesStateSelector,
+  (state) => state.page,
 );
 
 export const updateUserAvatar = createAsyncThunk(
@@ -64,9 +70,16 @@ const filesSlice = createSlice({
     toggleShowOffline(state) {
       state.showOffline = !state.showOffline;
     },
+    setPage(state, { payload }) {
+      state.page = payload;
+    },
   },
 });
 
-export const { setFilesFilters, toggleShowFavorites, toggleShowOffline } =
-  filesSlice.actions;
+export const {
+  setFilesFilters,
+  toggleShowFavorites,
+  toggleShowOffline,
+  setPage,
+} = filesSlice.actions;
 export default filesSlice.reducer;
