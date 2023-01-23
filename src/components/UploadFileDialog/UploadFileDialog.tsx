@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Typography,
 } from '@mui/material';
 import { useAppDispatch } from '@store';
 import {
@@ -14,7 +15,11 @@ import {
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { dialogActions, dialogContent } from './styles';
-import { DragDropArea, PendingFileComponent } from '@components';
+import {
+  ConfirmationModal,
+  DragDropArea,
+  PendingFileComponent,
+} from '@components';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
 
@@ -22,9 +27,12 @@ function UploadFileDialog() {
   const dispatch = useAppDispatch();
   const open = useSelector(uploadDialogOpenSelector);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>(
     {},
   );
+
+  const filesArr = Object.values(pendingFiles);
 
   const handleDropFiles = (acceptedFiles: File[]) => {
     setPendingFiles((prevFiles) =>
@@ -49,6 +57,19 @@ function UploadFileDialog() {
     dispatch(setUploadDialogOpen(false));
   };
 
+  const handleCancelClick = () => {
+    if (filesArr.length) {
+      setConfirmOpen(true);
+    } else {
+      handleClose();
+    }
+  };
+
+  const handleCancelUploadConfirm = () => {
+    handleClose();
+    setPendingFiles({});
+  };
+
   const handleRemoveFile = (fileId: string) => () => {
     setPendingFiles((prevFiles) => {
       const newFiles = { ...prevFiles };
@@ -65,32 +86,44 @@ function UploadFileDialog() {
     });
   };
 
-  const filesArr = Object.values(pendingFiles);
-
   return (
-    <Dialog onClose={handleClose} open={open} maxWidth="md">
-      <DialogTitle>Upload file</DialogTitle>
-      <DialogContent css={dialogContent}>
-        <DragDropArea
-          onDrop={handleDropFiles}
-          decreaseHeight={filesArr.length >= 5}
-        />
-        {filesArr.map((file) => (
-          <PendingFileComponent
-            file={file}
-            key={file._id}
-            onRemove={handleRemoveFile(file._id)}
-            onSaveFilename={handleSaveFilename(file._id)}
+    <>
+      <ConfirmationModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleCancelUploadConfirm}
+        color="error"
+      >
+        <Typography variant="body1">
+          Are you sure you want to cancel this uploading?
+        </Typography>
+      </ConfirmationModal>
+      <Dialog onClose={handleClose} open={open} maxWidth="md">
+        <DialogTitle>Upload file</DialogTitle>
+        <DialogContent css={dialogContent}>
+          <DragDropArea
+            onDrop={handleDropFiles}
+            decreaseHeight={filesArr.length >= 5}
           />
-        ))}
-      </DialogContent>
-      <DialogActions css={dialogActions}>
-        <Button variant="text">cancel</Button>
-        <Button variant="contained" disableElevation>
-          upload
-        </Button>
-      </DialogActions>
-    </Dialog>
+          {filesArr.map((file) => (
+            <PendingFileComponent
+              file={file}
+              key={file._id}
+              onRemove={handleRemoveFile(file._id)}
+              onSaveFilename={handleSaveFilename(file._id)}
+            />
+          ))}
+        </DialogContent>
+        <DialogActions css={dialogActions}>
+          <Button variant="text" onClick={handleCancelClick}>
+            cancel
+          </Button>
+          <Button variant="contained" disableElevation>
+            upload
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 

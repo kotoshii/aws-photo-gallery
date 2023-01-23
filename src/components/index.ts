@@ -13,3 +13,4 @@ export { default as UploadFileDialog } from './UploadFileDialog/UploadFileDialog
 export { default as DragDropArea } from './DragDropArea/DragDropArea';
 export { default as PendingFileComponent } from './PendingFileComponent/PendingFileComponent';
 export { default as EditableTitle } from './EditableTitle/EditableTitle';
+export { default as ConfirmationModal } from './ConfirmationModal/ConfirmationModal';
