@@ -9,10 +9,16 @@ export const uploadAreaWrapper = css`
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: height 0.25s ease-in-out;
 `;
 
 export const uploadAreaWrapperActive = css`
   background-color: rgba(25, 118, 210, 0.2);
+`;
+
+export const uploadAreaWrapperWithFiles = css`
+  height: 95px;
+  margin: 16px 0;
 `;
 
 export const uploadArea = css`
