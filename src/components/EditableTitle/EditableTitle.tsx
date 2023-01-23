@@ -11,6 +11,7 @@ import {
   editingTextField,
 } from './styles';
 import { ActionIconButton } from '@components';
+import { useParseFilename } from '@hooks/use-parse-filename';
 
 interface EditableTypographyProps {
   onEditConfirm: (newValue: string) => void;
@@ -20,6 +21,8 @@ interface EditableTypographyProps {
 function EditableTitle({ value, onEditConfirm }: EditableTypographyProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(value);
+
+  const { name, ext } = useParseFilename(value);
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -58,8 +61,22 @@ function EditableTitle({ value, onEditConfirm }: EditableTypographyProps) {
       />
     </Box>
   ) : (
-    <Typography variant="subtitle2">
-      {value}
+    <Typography
+      variant="subtitle2"
+      noWrap
+      width={300}
+      display="flex"
+      alignItems="center"
+    >
+      <Box
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        title={value}
+      >
+        {name}
+      </Box>
+      <Box title={value}>.{ext}</Box>
       <IconButton
         css={editButton}
         onClick={() => setIsEditing(true)}
