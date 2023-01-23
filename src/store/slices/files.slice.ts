@@ -5,17 +5,18 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { RootState } from '@store';
-import { FileObj } from '@interfaces/file.interface';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
 import { FIFTY_MB } from '@constants/common';
 import { Storage } from 'aws-amplify';
+import { File as FileModel } from '@models';
 
 export interface FilesState {
   showFavorites: boolean;
   showOffline: boolean;
-  data: FileObj[];
+  data: FileModel[];
   filters: FileFilters;
   page: number;
+  uploadDialogOpen: boolean;
 }
 
 const initialState: FilesState = {
@@ -29,6 +30,7 @@ const initialState: FilesState = {
   },
   data: [],
   page: 1,
+  uploadDialogOpen: false,
 };
 
 export const filesStateSelector = (state: RootState) => state.files;
@@ -47,6 +49,10 @@ export const showOfflineSelector = createSelector(
 export const pageSelector = createSelector(
   filesStateSelector,
   (state) => state.page,
+);
+export const uploadDialogOpenSelector = createSelector(
+  filesStateSelector,
+  (state) => state.uploadDialogOpen,
 );
 
 export const updateUserAvatar = createAsyncThunk(
@@ -70,8 +76,11 @@ const filesSlice = createSlice({
     toggleShowOffline(state) {
       state.showOffline = !state.showOffline;
     },
-    setPage(state, { payload }) {
+    setPage(state, { payload }: PayloadAction<number>) {
       state.page = payload;
+    },
+    setUploadDialogOpen(state, { payload }: PayloadAction<boolean>) {
+      state.uploadDialogOpen = payload;
     },
   },
 });
@@ -81,5 +90,6 @@ export const {
   toggleShowFavorites,
   toggleShowOffline,
   setPage,
+  setUploadDialogOpen,
 } = filesSlice.actions;
 export default filesSlice.reducer;

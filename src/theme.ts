@@ -22,6 +22,9 @@ export const theme = createTheme({
         contained: {
           borderRadius: 16,
         },
+        text: {
+          borderRadius: 16,
+        },
       },
     },
     MuiPopover: {
