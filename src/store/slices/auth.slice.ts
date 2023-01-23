@@ -52,7 +52,7 @@ async function fetchUserWithTokens(): Promise<UserDataWithTokens> {
     attributes: { name, sub, email },
   }: AwsUserInfo = await Auth.currentUserInfo();
 
-  const { results } = await Storage.list('avatar.jpg');
+  const { results } = await Storage.list('avatar.jpg', { pageSize: 1 });
   const avatarKey = results[0]?.key;
   const avatar = avatarKey ? await Storage.get(avatarKey) : null;
 
