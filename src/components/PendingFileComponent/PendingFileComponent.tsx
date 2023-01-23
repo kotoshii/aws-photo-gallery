@@ -11,13 +11,19 @@ import {
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { filesize } from 'filesize';
+import { EditableTitle } from '@components';
 
 interface PendingFileComponentProps {
   file: PendingFile;
   onRemove: () => void;
+  onSaveFilename: (newValue: string) => void;
 }
 
-function PendingFileComponent({ file, onRemove }: PendingFileComponentProps) {
+function PendingFileComponent({
+  file,
+  onRemove,
+  onSaveFilename,
+}: PendingFileComponentProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const isImage = file._fileObj.type.includes('image');
@@ -43,7 +49,7 @@ function PendingFileComponent({ file, onRemove }: PendingFileComponentProps) {
         )}
       </Box>
       <Box display="flex" flexDirection="column">
-        <Typography variant="subtitle2">{file.filename}</Typography>
+        <EditableTitle onEditConfirm={onSaveFilename} value={file.filename} />
         <Typography variant="caption">
           {filesize(file.size) as string}
         </Typography>

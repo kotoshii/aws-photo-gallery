@@ -12,7 +12,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import { filterButton, uploadButton } from './styles';
+import { actionButton, uploadButton } from './styles';
 import { useAppDispatch } from '@store';
 import {
   setUploadDialogOpen,
@@ -57,19 +57,19 @@ function NavbarStorage() {
       <ActionIconButton
         icon={<FilterAltIcon />}
         onClick={handleFiltersClick}
-        css={filterButton}
+        css={actionButton}
         active={!!filtersDropdownAnchor}
       />
       <ActionIconButton
         icon={<FavoriteIcon />}
         onClick={handleFavoritesClick}
-        css={filterButton}
+        css={actionButton}
         active={showFavorites}
       />
       <ActionIconButton
         icon={<CloudDownloadIcon />}
         onClick={handleOfflineClick}
-        css={filterButton}
+        css={actionButton}
         active={showOffline}
       />
       <Pagination />

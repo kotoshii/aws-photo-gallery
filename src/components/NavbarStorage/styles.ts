@@ -1,7 +1,9 @@
 import { css } from '@emotion/react';
 
-export const filterButton = css`
+export const actionButton = css`
   margin-left: 24px;
+  height: 56px;
+  width: 56px;
 `;
 
 export const uploadButton = css`

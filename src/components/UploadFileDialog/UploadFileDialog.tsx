@@ -57,6 +57,14 @@ function UploadFileDialog() {
     });
   };
 
+  const handleSaveFilename = (fileId: string) => (newFilename: string) => {
+    setPendingFiles((prevFiles) => {
+      const newFiles = { ...prevFiles };
+      newFiles[fileId].filename = newFilename;
+      return newFiles;
+    });
+  };
+
   const filesArr = Object.values(pendingFiles);
 
   return (
@@ -72,6 +80,7 @@ function UploadFileDialog() {
             file={file}
             key={file._id}
             onRemove={handleRemoveFile(file._id)}
+            onSaveFilename={handleSaveFilename(file._id)}
           />
         ))}
       </DialogContent>

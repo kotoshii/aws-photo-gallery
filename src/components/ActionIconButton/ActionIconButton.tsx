@@ -8,6 +8,7 @@ interface ActionIconButtonProps {
   onClick: (e: React.MouseEvent<HTMLElement>) => void;
   className?: string;
   active?: boolean;
+  disabled?: boolean;
 }
 
 function ActionIconButton({
@@ -15,9 +16,11 @@ function ActionIconButton({
   onClick,
   className,
   active,
+  disabled,
 }: ActionIconButtonProps) {
   return (
     <IconButton
+      disabled={disabled}
       css={[actionIconButton, active ? actionButtonActive : null]}
       onClick={onClick}
       className={className}
