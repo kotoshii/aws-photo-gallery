@@ -15,6 +15,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { filterButton, uploadButton } from './styles';
 import { useAppDispatch } from '@store';
 import {
+  setUploadDialogOpen,
   showFavoritesSelector,
   showOfflineSelector,
   toggleShowFavorites,
@@ -46,6 +47,10 @@ function NavbarStorage() {
     setFiltersDropdownAnchor(null);
   };
 
+  const handleUploadDialogButtonClick = () => {
+    dispatch(setUploadDialogOpen(true));
+  };
+
   return (
     <NavbarEmpty>
       <TextField placeholder="Search..." sx={{ width: 400 }} />
@@ -73,6 +78,7 @@ function NavbarStorage() {
         startIcon={<CloudUploadIcon />}
         variant="contained"
         css={uploadButton}
+        onClick={handleUploadDialogButtonClick}
       >
         upload new file
       </Button>
