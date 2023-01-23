@@ -5,7 +5,7 @@ import {
   uploadArea,
   inputElement,
   uploadAreaWrapperActive,
-  uploadAreaWrapperWithFiles,
+  uploadAreaWrapperDecreasedHeight,
 } from './styles';
 import { Box, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -14,10 +14,10 @@ import { FIFTY_MB } from '@constants/common';
 
 interface DragDropAreaProps {
   onDrop: (acceptedFiles: File[]) => void;
-  hasPendingFiles: boolean;
+  decreaseHeight: boolean;
 }
 
-function DragDropArea({ onDrop, hasPendingFiles }: DragDropAreaProps) {
+function DragDropArea({ onDrop, decreaseHeight }: DragDropAreaProps) {
   const [draggingOver, setDraggingOver] = useState(false);
 
   const { getInputProps, getRootProps } = useDropzone({
@@ -40,7 +40,7 @@ function DragDropArea({ onDrop, hasPendingFiles }: DragDropAreaProps) {
       css={[
         uploadAreaWrapper,
         draggingOver ? uploadAreaWrapperActive : null,
-        hasPendingFiles ? uploadAreaWrapperWithFiles : null,
+        decreaseHeight ? uploadAreaWrapperDecreasedHeight : null,
       ]}
       width={1}
     >

@@ -57,7 +57,7 @@ function UploadFileDialog() {
       <DialogContent css={dialogContent}>
         <DragDropArea
           onDrop={handleDropFiles}
-          hasPendingFiles={!!filesArr.length}
+          decreaseHeight={filesArr.length >= 5}
         />
         {filesArr.map((file) => (
           <PendingFileComponent file={file} key={file._id} />
