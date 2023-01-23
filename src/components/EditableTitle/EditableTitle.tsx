@@ -76,7 +76,7 @@ function EditableTitle({ value, onEditConfirm }: EditableTypographyProps) {
       >
         {name}
       </Box>
-      <Box title={value}>.{ext}</Box>
+      {ext ? <Box title={value}>.{ext}</Box> : null}
       <IconButton
         css={editButton}
         onClick={() => setIsEditing(true)}
