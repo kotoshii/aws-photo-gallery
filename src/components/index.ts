@@ -11,3 +11,4 @@ export { default as UserAvatar } from './UserAvatar/UserAvatar';
 export { default as FiltersDropdown } from './FiltersDropdown/FiltersDropdown';
 export { default as UploadFileDialog } from './UploadFileDialog/UploadFileDialog';
 export { default as DragDropArea } from './DragDropArea/DragDropArea';
+export { default as PendingFileComponent } from './PendingFileComponent/PendingFileComponent';

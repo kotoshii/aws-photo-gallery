@@ -14,7 +14,7 @@ import {
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { dialogActions, dialogContent } from './styles';
-import { DragDropArea } from '@components';
+import { DragDropArea, PendingFileComponent } from '@components';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
 
@@ -49,11 +49,19 @@ function UploadFileDialog() {
     dispatch(setUploadDialogOpen(false));
   };
 
+  const filesArr = Object.values(pendingFiles);
+
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="md">
       <DialogTitle>Upload file</DialogTitle>
       <DialogContent css={dialogContent}>
-        <DragDropArea onDrop={handleDropFiles} />
+        <DragDropArea
+          onDrop={handleDropFiles}
+          hasPendingFiles={!!filesArr.length}
+        />
+        {filesArr.map((file) => (
+          <PendingFileComponent file={file} key={file._id} />
+        ))}
       </DialogContent>
       <DialogActions css={dialogActions}>
         <Button variant="text">cancel</Button>
