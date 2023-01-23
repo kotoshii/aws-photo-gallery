@@ -41,5 +41,19 @@ export const theme = createTheme({
         },
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiPickersDay: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
   },
 });
