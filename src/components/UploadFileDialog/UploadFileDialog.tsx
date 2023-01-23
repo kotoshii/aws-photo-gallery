@@ -49,6 +49,14 @@ function UploadFileDialog() {
     dispatch(setUploadDialogOpen(false));
   };
 
+  const handleRemoveFile = (fileId: string) => () => {
+    setPendingFiles((prevFiles) => {
+      const newFiles = { ...prevFiles };
+      delete newFiles[fileId];
+      return newFiles;
+    });
+  };
+
   const filesArr = Object.values(pendingFiles);
 
   return (
@@ -60,7 +68,11 @@ function UploadFileDialog() {
           decreaseHeight={filesArr.length >= 5}
         />
         {filesArr.map((file) => (
-          <PendingFileComponent file={file} key={file._id} />
+          <PendingFileComponent
+            file={file}
+            key={file._id}
+            onRemove={handleRemoveFile(file._id)}
+          />
         ))}
       </DialogContent>
       <DialogActions css={dialogActions}>

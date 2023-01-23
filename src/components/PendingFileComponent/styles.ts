@@ -25,3 +25,7 @@ export const filePreviewImage = css`
   border-radius: 10px;
   object-fit: cover;
 `;
+
+export const removeButton = css`
+  margin-left: auto;
+`;

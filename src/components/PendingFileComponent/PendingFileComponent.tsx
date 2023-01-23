@@ -1,20 +1,23 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useState } from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Typography } from '@mui/material';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import {
   filePreviewImage,
   filePreviewWrapper,
   pendingFileComponent,
+  removeButton,
 } from './styles';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { filesize } from 'filesize';
 
 interface PendingFileComponentProps {
   file: PendingFile;
+  onRemove: () => void;
 }
 
-function PendingFileComponent({ file }: PendingFileComponentProps) {
+function PendingFileComponent({ file, onRemove }: PendingFileComponentProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const isImage = file._fileObj.type.includes('image');
@@ -45,6 +48,9 @@ function PendingFileComponent({ file }: PendingFileComponentProps) {
           {filesize(file.size) as string}
         </Typography>
       </Box>
+      <IconButton css={removeButton} onClick={onRemove}>
+        <CancelIcon />
+      </IconButton>
     </Paper>
   );
 }
