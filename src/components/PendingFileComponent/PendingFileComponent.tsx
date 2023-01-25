@@ -81,7 +81,7 @@ function PendingFileComponent({
           fullWidth
           rows={2}
           css={descriptionTextField}
-          value={file.description}
+          value={file.description || ''}
           onChange={(e) => onDescriptionChange(e.target.value)}
         />
       )}
