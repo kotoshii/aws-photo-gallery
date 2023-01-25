@@ -12,6 +12,7 @@ import { useAppDispatch } from '@store';
 import {
   setUploadDialogOpen,
   uploadDialogOpenSelector,
+  uploadFiles,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { dialogActions, dialogContent } from './styles';
@@ -33,8 +34,6 @@ function UploadFileDialog() {
   );
 
   const filesArr = Object.values(pendingFiles);
-
-  const handleUploadClick = () => {};
 
   const handleDropFiles = (acceptedFiles: File[]) => {
     setPendingFiles((prevFiles) =>
@@ -98,6 +97,11 @@ function UploadFileDialog() {
       newFiles[fileId].description = description || null;
       return newFiles;
     });
+  };
+
+  const handleUploadClick = () => {
+    dispatch(uploadFiles(filesArr));
+    handleCancelUploadConfirm();
   };
 
   return (
