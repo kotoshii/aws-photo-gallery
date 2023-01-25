@@ -53,7 +53,11 @@ function UploadFileDialog() {
     );
   };
 
-  const handleClose = () => {
+  const handleClose = (e: Event, reason?: string) => {
+    if (reason === 'backdropClick') {
+      return;
+    }
+
     dispatch(setUploadDialogOpen(false));
   };
 
@@ -61,12 +65,12 @@ function UploadFileDialog() {
     if (filesArr.length) {
       setConfirmOpen(true);
     } else {
-      handleClose();
+      dispatch(setUploadDialogOpen(false));
     }
   };
 
   const handleCancelUploadConfirm = () => {
-    handleClose();
+    dispatch(setUploadDialogOpen(false));
     setPendingFiles({});
   };
 
@@ -98,7 +102,12 @@ function UploadFileDialog() {
           Are you sure you want to cancel this uploading?
         </Typography>
       </ConfirmationModal>
-      <Dialog onClose={handleClose} open={open} maxWidth="md">
+      <Dialog
+        onClose={handleClose}
+        open={open}
+        maxWidth="md"
+        disableEscapeKeyDown
+      >
         <DialogTitle>Upload file</DialogTitle>
         <DialogContent css={dialogContent}>
           <DragDropArea
