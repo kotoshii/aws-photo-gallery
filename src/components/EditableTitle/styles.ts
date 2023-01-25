@@ -28,3 +28,10 @@ export const editingTextField = css`
     bottom: 4px;
   }
 `;
+
+export const editDescButton = css`
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  margin-left: 4px;
+`;

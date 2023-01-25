@@ -34,6 +34,8 @@ function UploadFileDialog() {
 
   const filesArr = Object.values(pendingFiles);
 
+  const handleUploadClick = () => {};
+
   const handleDropFiles = (acceptedFiles: File[]) => {
     setPendingFiles((prevFiles) =>
       acceptedFiles.reduce<Record<string, PendingFile>>((acc, file) => {
@@ -90,6 +92,14 @@ function UploadFileDialog() {
     });
   };
 
+  const handleEditDescription = (fileId: string) => (description: string) => {
+    setPendingFiles((prevFiles) => {
+      const newFiles = { ...prevFiles };
+      newFiles[fileId].description = description || null;
+      return newFiles;
+    });
+  };
+
   return (
     <>
       <ConfirmationModal
@@ -120,6 +130,7 @@ function UploadFileDialog() {
               key={file._id}
               onRemove={handleRemoveFile(file._id)}
               onSaveFilename={handleSaveFilename(file._id)}
+              onDescriptionChange={handleEditDescription(file._id)}
             />
           ))}
         </DialogContent>
@@ -127,7 +138,11 @@ function UploadFileDialog() {
           <Button variant="text" onClick={handleCancelClick}>
             cancel
           </Button>
-          <Button variant="contained" disableElevation>
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={handleUploadClick}
+          >
             upload
           </Button>
         </DialogActions>

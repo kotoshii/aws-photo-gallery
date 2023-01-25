@@ -4,6 +4,7 @@ export const pendingFileComponent = css`
   border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 8px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 16px;
 `;
@@ -28,4 +29,10 @@ export const filePreviewImage = css`
 
 export const removeButton = css`
   margin-left: auto;
+  width: 48px;
+  height: 48px;
+`;
+
+export const descriptionTextField = css`
+  margin-top: 8px;
 `;

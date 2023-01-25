@@ -4,9 +4,11 @@ import { Box, IconButton, TextField, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import ArticleIcon from '@mui/icons-material/Article';
 import {
   editActionButton,
   editButton,
+  editDescButton,
   editingFieldWrapper,
   editingTextField,
 } from './styles';
@@ -16,9 +18,16 @@ import { useParseFilename } from '@hooks/use-parse-filename';
 interface EditableTypographyProps {
   onEditConfirm: (newValue: string) => void;
   value: string;
+  onEditDescriptionClick: () => void;
+  openEditDescription: boolean;
 }
 
-function EditableTitle({ value, onEditConfirm }: EditableTypographyProps) {
+function EditableTitle({
+  value,
+  onEditConfirm,
+  onEditDescriptionClick,
+  openEditDescription,
+}: EditableTypographyProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(value);
 
@@ -84,6 +93,12 @@ function EditableTitle({ value, onEditConfirm }: EditableTypographyProps) {
       >
         <EditIcon fontSize="small" />
       </IconButton>
+      <ActionIconButton
+        icon={<ArticleIcon fontSize="medium" />}
+        onClick={onEditDescriptionClick}
+        active={openEditDescription}
+        css={editDescButton}
+      />
     </Typography>
   );
 }
