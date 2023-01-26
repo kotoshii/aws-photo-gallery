@@ -100,7 +100,7 @@ function UploadFileDialog() {
 
   const handleUploadClick = () => {
     dispatch(uploadFiles(filesArr));
-    handleCancelUploadConfirm();
+    dispatch(setUploadDialogOpen(false));
   };
 
   return (

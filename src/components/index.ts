@@ -15,3 +15,4 @@ export { default as PendingFileComponent } from './PendingFileComponent/PendingF
 export { default as EditableTitle } from './EditableTitle/EditableTitle';
 export { default as ConfirmationModal } from './ConfirmationModal/ConfirmationModal';
 export { default as UploadingOverlay } from './UploadingOverlay/UploadingOverlay';
+export { default as UploadingFileComponent } from './UploadingFileComponent/UploadingFileComponent';

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -13,13 +13,22 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { uploadingInfoSelector } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
+import UploadingFileComponent from '../UploadingFileComponent/UploadingFileComponent';
+import { PendingFilesContext } from '@contexts/pending-files.context';
 
 function UploadingOverlay() {
   const { files, totalSize } = useSelector(uploadingInfoSelector);
+  const { pendingFiles } = useContext(PendingFilesContext);
+
   const filesArr = Object.values(files);
+  const ids = Object.keys(files);
+  console.log(ids);
+  console.log(pendingFiles);
+
   const progress =
     (filesArr.reduce((acc, { loaded }) => acc + loaded, 0) / totalSize) * 100 ||
     0;
+
   const amounts = useMemo(() => {
     const res: Record<UploadingStatus, number> = {
       in_progress: 0,
@@ -49,6 +58,8 @@ function UploadingOverlay() {
     return text;
   }, [files]);
 
+  const handleCancelUpload = () => {};
+
   return (
     <Accordion css={uploadingOverlay} disableGutters elevation={0}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -66,7 +77,16 @@ function UploadingOverlay() {
           </Box>
         </Box>
       </AccordionSummary>
-      <AccordionDetails>Some textSome textSome textSome text</AccordionDetails>
+      <AccordionDetails>
+        {ids.map((id) => (
+          <UploadingFileComponent
+            key={id}
+            fileInfo={files[id]}
+            pendingFile={pendingFiles[id]}
+            onCancel={handleCancelUpload}
+          />
+        ))}
+      </AccordionDetails>
     </Accordion>
   );
 }

@@ -44,6 +44,7 @@ const initialState: FilesState = {
   uploadingInfo: {
     files: {},
     totalSize: 0,
+    uploading: false,
   },
 };
 
@@ -140,12 +141,13 @@ export const uploadFiles = createAsyncThunk(
     const uploadingInfo: UploadingInfo = {
       files: filesInfo,
       totalSize,
+      uploading: true,
     };
 
     dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
 
     for (const file of files) {
-      void uploadFileToS3(file, dispatch);
+      // void uploadFileToS3(file, dispatch);
     }
   },
 );
@@ -176,6 +178,7 @@ const filesSlice = createSlice({
       };
       state.uploadingInfo.totalSize =
         state.uploadingInfo.totalSize + payload.totalSize;
+      state.uploadingInfo.uploading = payload.uploading;
     },
     setUploadingProgress(
       state,
