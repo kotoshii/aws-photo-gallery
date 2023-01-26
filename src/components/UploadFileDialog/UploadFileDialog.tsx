@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -23,15 +23,14 @@ import {
 } from '@components';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
+import { PendingFilesContext } from '@contexts/pending-files.context';
 
 function UploadFileDialog() {
   const dispatch = useAppDispatch();
   const open = useSelector(uploadDialogOpenSelector);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>(
-    {},
-  );
+  const { pendingFiles, setPendingFiles } = useContext(PendingFilesContext);
 
   const filesArr = Object.values(pendingFiles);
 
