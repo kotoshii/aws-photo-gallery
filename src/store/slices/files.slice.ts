@@ -107,6 +107,10 @@ export const uploadDialogOpenSelector = createSelector(
   filesStateSelector,
   (state) => state.uploadDialogOpen,
 );
+export const uploadingInfoSelector = createSelector(
+  filesStateSelector,
+  (state) => state.uploadingInfo,
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',

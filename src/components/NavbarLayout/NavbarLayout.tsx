@@ -3,7 +3,12 @@ import React, { useMemo } from 'react';
 import { Outlet, useMatch } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { AppRoutes } from '@constants/app-routes';
-import { NavbarStorage, NavbarSettings, UploadFileDialog } from '@components';
+import {
+  NavbarStorage,
+  NavbarSettings,
+  UploadFileDialog,
+  UploadingOverlay,
+} from '@components';
 import { navbarLayout } from './styles';
 
 function NavbarLayout() {
@@ -19,6 +24,7 @@ function NavbarLayout() {
     <>
       {navbar}
       <UploadFileDialog />
+      <UploadingOverlay />
       <Box px={4} height={1} width={1} overflow="auto" css={navbarLayout}>
         <Outlet />
       </Box>
