@@ -10,7 +10,7 @@ import {
   removeButton,
 } from './styles';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { filesize } from 'filesize';
 import { EditableTitle } from '@components';
 
@@ -71,7 +71,7 @@ function PendingFileComponent({
           </Typography>
         </Box>
         <IconButton css={removeButton} onClick={onRemove}>
-          <CancelIcon />
+          <DeleteIcon />
         </IconButton>
       </Box>
       {editingDescription && (
