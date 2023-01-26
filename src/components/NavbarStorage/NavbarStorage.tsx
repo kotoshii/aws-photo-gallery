@@ -20,6 +20,7 @@ import {
   showOfflineSelector,
   toggleShowFavorites,
   toggleShowOffline,
+  uploadingInfoSelector,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 
@@ -30,6 +31,7 @@ function NavbarStorage() {
 
   const showFavorites = useSelector(showFavoritesSelector);
   const showOffline = useSelector(showOfflineSelector);
+  const { uploading } = useSelector(uploadingInfoSelector);
 
   const handleFiltersClick = (event: React.MouseEvent<HTMLElement>) => {
     setFiltersDropdownAnchor(event.currentTarget);
@@ -79,6 +81,7 @@ function NavbarStorage() {
         variant="contained"
         css={uploadButton}
         onClick={handleUploadDialogButtonClick}
+        disabled={uploading}
       >
         upload new file
       </Button>
