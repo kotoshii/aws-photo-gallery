@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -10,7 +10,10 @@ import {
 } from '@mui/material';
 import { linearProgress, uploadingOverlay } from './styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { uploadingInfoSelector } from '@store/slices/files.slice';
+import {
+  isUploadingSelector,
+  uploadingInfoSelector,
+} from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
 import UploadingFileComponent from '../UploadingFileComponent/UploadingFileComponent';
@@ -18,12 +21,13 @@ import { PendingFilesContext } from '@contexts/pending-files.context';
 
 function UploadingOverlay() {
   const { files, totalSize } = useSelector(uploadingInfoSelector);
+  const uploading = useSelector(isUploadingSelector);
+
   const { pendingFiles } = useContext(PendingFilesContext);
+  const [expanded, setExpanded] = useState(false);
 
   const filesArr = Object.values(files);
   const ids = Object.keys(files);
-  console.log(ids);
-  console.log(pendingFiles);
 
   const progress =
     (filesArr.reduce((acc, { loaded }) => acc + loaded, 0) / totalSize) * 100 ||
@@ -60,8 +64,14 @@ function UploadingOverlay() {
 
   const handleCancelUpload = () => {};
 
-  return (
-    <Accordion css={uploadingOverlay} disableGutters elevation={0}>
+  return uploading ? (
+    <Accordion
+      css={uploadingOverlay}
+      disableGutters
+      elevation={0}
+      expanded={expanded}
+      onChange={(e, expanded) => setExpanded(expanded)}
+    >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Box display="flex" width={1} flexDirection="column" mr={3}>
           <Typography variant="body1">{progressText}</Typography>
@@ -88,7 +98,7 @@ function UploadingOverlay() {
         ))}
       </AccordionDetails>
     </Accordion>
-  );
+  ) : null;
 }
 
 export default UploadingOverlay;

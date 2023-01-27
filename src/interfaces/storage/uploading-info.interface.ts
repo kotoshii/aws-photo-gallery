@@ -8,5 +8,4 @@ export interface FileUploadingInfo {
 export interface UploadingInfo {
   files: Record<string, FileUploadingInfo>;
   totalSize: number;
-  uploading: boolean;
 }
