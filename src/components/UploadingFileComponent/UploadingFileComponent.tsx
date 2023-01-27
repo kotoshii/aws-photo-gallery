@@ -40,9 +40,10 @@ function UploadingFileComponent({
   }, []);
 
   const { name, ext } = useParseFilename(pendingFile.filename);
+  const progress = (fileInfo.loaded / pendingFile.size) * 100;
 
   return (
-    <Paper elevation={0} css={uploadingFileComponent}>
+    <Paper elevation={0} css={uploadingFileComponent(progress)}>
       <Box width={1} display="flex">
         <Box css={filePreviewWrapper}>
           {isImage && imageSrc ? (
