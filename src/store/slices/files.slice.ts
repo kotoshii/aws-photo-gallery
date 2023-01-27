@@ -44,7 +44,6 @@ const initialState: FilesState = {
   uploadingInfo: {
     files: {},
     totalSize: 0,
-    uploading: false,
   },
 };
 
@@ -112,6 +111,11 @@ export const uploadingInfoSelector = createSelector(
   filesStateSelector,
   (state) => state.uploadingInfo,
 );
+export const isUploadingSelector = createSelector(filesStateSelector, (state) =>
+  Object.values(state.uploadingInfo.files).some(
+    ({ status }) => status === 'waiting' || status === 'in_progress',
+  ),
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -141,7 +145,6 @@ export const uploadFiles = createAsyncThunk(
     const uploadingInfo: UploadingInfo = {
       files: filesInfo,
       totalSize,
-      uploading: true,
     };
 
     dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
@@ -178,7 +181,6 @@ const filesSlice = createSlice({
       };
       state.uploadingInfo.totalSize =
         state.uploadingInfo.totalSize + payload.totalSize;
-      state.uploadingInfo.uploading = payload.uploading;
     },
     setUploadingProgress(
       state,
