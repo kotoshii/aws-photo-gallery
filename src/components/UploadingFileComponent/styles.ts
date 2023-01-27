@@ -7,6 +7,7 @@ export const uploadingFileComponent = css`
   flex-direction: column;
   align-items: center;
   margin-bottom: 16px;
+  background-color: #f8f9fa;
 `;
 
 export const filePreviewWrapper = css`
@@ -31,4 +32,5 @@ export const cancelButton = css`
   margin-left: auto;
   width: 48px;
   height: 48px;
+  display: none;
 `;
