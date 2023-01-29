@@ -8,3 +8,7 @@ export const actionIconButton = css`
 export const actionButtonActive = css`
   box-shadow: inset 0 0 5px #c1c1c1;
 `;
+
+export const actionButtonBorderless = css`
+  border: none;
+`;

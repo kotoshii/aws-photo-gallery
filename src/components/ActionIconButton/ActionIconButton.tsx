@@ -1,6 +1,10 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import { actionButtonActive, actionIconButton } from './styles';
+import {
+  actionButtonActive,
+  actionButtonBorderless,
+  actionIconButton,
+} from './styles';
 import { IconButton } from '@mui/material';
 
 interface ActionIconButtonProps {
@@ -9,6 +13,7 @@ interface ActionIconButtonProps {
   className?: string;
   active?: boolean;
   disabled?: boolean;
+  borderless?: boolean;
 }
 
 function ActionIconButton({
@@ -17,11 +22,16 @@ function ActionIconButton({
   className,
   active,
   disabled,
+  borderless,
 }: ActionIconButtonProps) {
   return (
     <IconButton
       disabled={disabled}
-      css={[actionIconButton, active ? actionButtonActive : null]}
+      css={[
+        actionIconButton,
+        active ? actionButtonActive : null,
+        borderless ? actionButtonBorderless : null,
+      ]}
       onClick={onClick}
       className={className}
     >

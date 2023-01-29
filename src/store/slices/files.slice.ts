@@ -26,6 +26,7 @@ export interface FilesState {
   filters: FileFilters;
   page: number;
   uploadDialogOpen: boolean;
+  uploadOverlayOpen: boolean;
   uploadingInfo: UploadingInfo;
 }
 
@@ -41,6 +42,7 @@ const initialState: FilesState = {
   data: [],
   page: 1,
   uploadDialogOpen: false,
+  uploadOverlayOpen: false,
   uploadingInfo: {
     files: {},
     totalSize: 0,
@@ -116,6 +118,10 @@ export const isUploadingSelector = createSelector(filesStateSelector, (state) =>
     ({ status }) => status === 'waiting' || status === 'in_progress',
   ),
 );
+export const uploadingOverlayOpenSelector = createSelector(
+  filesStateSelector,
+  (state) => state.uploadOverlayOpen,
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -148,6 +154,7 @@ export const uploadFiles = createAsyncThunk(
     };
 
     dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
+    dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
 
     for (const file of files) {
       // void uploadFileToS3(file, dispatch);
@@ -198,6 +205,9 @@ const filesSlice = createSlice({
     ) {
       state.uploadingInfo.files[fileId].status = status;
     },
+    setUploadingOverlayOpen(state, { payload }: PayloadAction<boolean>) {
+      state.uploadOverlayOpen = payload;
+    },
   },
 });
 
@@ -207,5 +217,6 @@ export const {
   toggleShowOffline,
   setPage,
   setUploadDialogOpen,
+  setUploadingOverlayOpen,
 } = filesSlice.actions;
 export default filesSlice.reducer;

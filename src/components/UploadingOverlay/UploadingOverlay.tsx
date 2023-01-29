@@ -8,20 +8,33 @@ import {
   LinearProgress,
   Typography,
 } from '@mui/material';
-import { accordionDetails, linearProgress, uploadingOverlay } from './styles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-  isUploadingSelector,
+  accordionDetails,
+  linearProgress,
+  toggleOverlayButton,
+  uploadingOverlay,
+  uploadingOverlayHidden,
+  uploadingOverlayWrapper,
+} from './styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import {
+  setUploadingOverlayOpen,
   uploadingInfoSelector,
+  uploadingOverlayOpenSelector,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
-import { UploadingFileComponent } from '@components';
+import { ActionIconButton, UploadingFileComponent } from '@components';
 import { PendingFilesContext } from '@contexts/pending-files.context';
+import { useAppDispatch } from '@store';
 
 function UploadingOverlay() {
+  const dispatch = useAppDispatch();
+
   const { files, totalSize } = useSelector(uploadingInfoSelector);
-  const uploading = useSelector(isUploadingSelector);
+  const uploadingOverlayOpen = useSelector(uploadingOverlayOpenSelector);
 
   const { pendingFiles } = useContext(PendingFilesContext);
   const [expanded, setExpanded] = useState(false);
@@ -64,41 +77,76 @@ function UploadingOverlay() {
 
   const handleCancelUpload = () => {};
 
-  return uploading ? (
-    <Accordion
-      css={uploadingOverlay}
-      disableGutters
-      elevation={0}
-      expanded={expanded}
-      onChange={(e, expanded) => setExpanded(expanded)}
+  const handleCloseOverlay = () => {
+    dispatch(setUploadingOverlayOpen(!uploadingOverlayOpen));
+    setExpanded(false);
+  };
+
+  const handleAccordingExpand = (
+    e: React.SyntheticEvent,
+    expanded: boolean,
+  ) => {
+    if (filesArr.length) {
+      setExpanded(expanded);
+    }
+  };
+
+  return (
+    <Box
+      css={[
+        uploadingOverlayWrapper,
+        !uploadingOverlayOpen ? uploadingOverlayHidden : null,
+      ]}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Box display="flex" width={1} flexDirection="column" mr={3}>
-          <Typography variant="body1">{progressText}</Typography>
-          <Box display="flex" alignItems="baseline">
-            <LinearProgress
-              css={linearProgress}
-              variant="determinate"
-              value={progress}
-            />
-            <Typography variant="body2" ml={3}>
-              {progress.toFixed(1)} %
-            </Typography>
+      <Accordion
+        css={uploadingOverlay(expanded)}
+        disableGutters
+        elevation={0}
+        expanded={expanded}
+        onChange={handleAccordingExpand}
+      >
+        <AccordionSummary
+          expandIcon={filesArr.length ? <ExpandMoreIcon /> : null}
+        >
+          <Box display="flex" width={1} flexDirection="column" mr={3}>
+            <Typography variant="body1">{progressText}</Typography>
+            <Box display="flex" alignItems="baseline">
+              <LinearProgress
+                css={linearProgress}
+                variant="determinate"
+                value={progress}
+              />
+              <Typography variant="body2" ml={3}>
+                {progress.toFixed(1)} %
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </AccordionSummary>
-      <AccordionDetails css={accordionDetails}>
-        {ids.map((id) => (
-          <UploadingFileComponent
-            key={id}
-            fileInfo={files[id]}
-            pendingFile={pendingFiles[id]}
-            onCancel={handleCancelUpload}
-          />
-        ))}
-      </AccordionDetails>
-    </Accordion>
-  ) : null;
+        </AccordionSummary>
+        <AccordionDetails css={accordionDetails}>
+          {ids.map((id) => (
+            <UploadingFileComponent
+              key={id}
+              fileInfo={files[id]}
+              pendingFile={pendingFiles[id]}
+              onCancel={handleCancelUpload}
+            />
+          ))}
+        </AccordionDetails>
+      </Accordion>
+      <ActionIconButton
+        borderless
+        css={toggleOverlayButton}
+        icon={
+          uploadingOverlayOpen ? (
+            <KeyboardArrowLeftIcon />
+          ) : (
+            <KeyboardArrowRightIcon />
+          )
+        }
+        onClick={handleCloseOverlay}
+      />
+    </Box>
+  );
 }
 
 export default UploadingOverlay;
