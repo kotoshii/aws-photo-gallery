@@ -1,12 +1,12 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   filePreviewImage,
   filePreviewWrapper,
   uploadingFileComponent,
   cancelButton,
 } from './styles';
-import { Box, IconButton, Paper, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Typography, useTheme } from '@mui/material';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { filesize } from 'filesize';
 import Cancel from '@mui/icons-material/Cancel';
@@ -42,8 +42,23 @@ function UploadingFileComponent({
   const { name, ext } = useParseFilename(pendingFile.filename);
   const progress = (fileInfo.loaded / pendingFile.size) * 100;
 
+  const theme = useTheme();
+  const statusColor = useMemo(() => {
+    switch (fileInfo.status) {
+      case 'completed':
+        return theme.palette.success.light;
+      case 'error':
+        return theme.palette.error.main;
+      case 'in_progress':
+        return theme.palette.primary.main;
+    }
+  }, [fileInfo.status]);
+
   return (
-    <Paper elevation={0} css={uploadingFileComponent(progress)}>
+    <Paper
+      elevation={0}
+      css={uploadingFileComponent(progress, fileInfo.status, statusColor)}
+    >
       <Box width={1} display="flex">
         <Box css={filePreviewWrapper}>
           {isImage && imageSrc ? (

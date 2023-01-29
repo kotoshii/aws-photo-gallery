@@ -1,35 +1,46 @@
 import { css } from '@emotion/react';
+import { alpha } from '@mui/material';
+import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
 
-export const uploadingFileComponent = (progress: number) => css`
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 16px;
-  background-color: #f8f9fa;
-  position: relative;
+export const uploadingFileComponent = (
+  progress: number,
+  status: UploadingStatus,
+  statusColor?: string,
+) => {
+  const bgColor =
+    !statusColor || status === 'in_progress'
+      ? '#f8f9fa'
+      : `${alpha(statusColor, 0.1)}`;
 
-  & > .MuiBox-root {
-    z-index: 1;
-  }
+  const background =
+    status === 'in_progress'
+      ? `background: linear-gradient(
+      to right,
+      rgba(25, 118, 210, 0.25) ${progress}%,
+      ${bgColor} ${progress}% 100%
+    );`
+      : '';
 
-  &:after {
-    height: 100%;
-    background-color: rgba(25, 118, 210, 0.25);
-    width: ${progress}%;
-    content: '\\A';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    border-radius: 15px;
-  }
+  return css`
+    border: 1px solid ${!statusColor ? 'rgba(0, 0, 0, 0.2)' : statusColor};
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+    background-color: ${bgColor};
+    position: relative;
+    ${background}
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
+    & > .MuiBox-root {
+      z-index: 1;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  `;
+};
 
 export const filePreviewWrapper = css`
   width: 48px;

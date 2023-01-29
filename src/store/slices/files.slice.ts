@@ -136,12 +136,11 @@ export const uploadFiles = createAsyncThunk(
   async (files: PendingFile[], { dispatch }) => {
     const totalSize = files.reduce((total, { size }) => total + size, 0);
     const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
-      (acc, { _id, filename, size }) => ({
+      (acc, { _id }) => ({
         ...acc,
         [_id]: {
+          _id,
           status: 'waiting',
-          filename,
-          size,
           loaded: 0,
         } as FileUploadingInfo,
       }),
