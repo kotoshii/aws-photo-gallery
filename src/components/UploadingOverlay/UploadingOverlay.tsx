@@ -42,10 +42,6 @@ function UploadingOverlay() {
   const filesArr = Object.values(files);
   const ids = Object.keys(files);
 
-  const progress =
-    (filesArr.reduce((acc, { loaded }) => acc + loaded, 0) / totalSize) * 100 ||
-    0;
-
   const amounts = useMemo(() => {
     const res: Record<UploadingStatus, number> = {
       in_progress: 0,
@@ -59,6 +55,14 @@ function UploadingOverlay() {
     });
 
     return res;
+  }, [files]);
+
+  const progress = useMemo(() => {
+    const percentage =
+      (filesArr.reduce((acc, { loaded }) => acc + loaded, 0) / totalSize) *
+        100 || 0;
+
+    return amounts.in_progress ? percentage : 0;
   }, [files]);
 
   const progressText = useMemo(() => {
