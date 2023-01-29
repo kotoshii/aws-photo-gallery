@@ -25,6 +25,10 @@ export const uploadingFileComponent = (progress: number) => css`
     left: 0;
     border-radius: 15px;
   }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 export const filePreviewWrapper = css`
