@@ -207,6 +207,11 @@ const filesSlice = createSlice({
     setUploadingOverlayOpen(state, { payload }: PayloadAction<boolean>) {
       state.uploadOverlayOpen = payload;
     },
+    deleteFailedFile(state, { payload }: PayloadAction<string>) {
+      const newFiles = { ...state.uploadingInfo.files };
+      delete newFiles[payload];
+      state.uploadingInfo.files = newFiles;
+    },
   },
 });
 
@@ -217,5 +222,6 @@ export const {
   setPage,
   setUploadDialogOpen,
   setUploadingOverlayOpen,
+  deleteFailedFile,
 } = filesSlice.actions;
 export default filesSlice.reducer;

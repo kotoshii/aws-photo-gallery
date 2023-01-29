@@ -60,9 +60,8 @@ export const filePreviewImage = css`
   object-fit: cover;
 `;
 
-export const cancelButton = css`
+export const actionButton = css`
   margin-left: auto;
   width: 48px;
   height: 48px;
-  display: none;
 `;

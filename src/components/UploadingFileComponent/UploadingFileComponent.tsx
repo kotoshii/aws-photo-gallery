@@ -4,12 +4,13 @@ import {
   filePreviewImage,
   filePreviewWrapper,
   uploadingFileComponent,
-  cancelButton,
+  actionButton,
 } from './styles';
 import { Box, IconButton, Paper, Typography, useTheme } from '@mui/material';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import { filesize } from 'filesize';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Cancel from '@mui/icons-material/Cancel';
+import { filesize } from 'filesize';
 import { FileUploadingInfo } from '@interfaces/storage/uploading-info.interface';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { useParseFilename } from '@hooks/use-parse-filename';
@@ -18,12 +19,14 @@ interface UploadingFileComponentProps {
   fileInfo: FileUploadingInfo;
   pendingFile: PendingFile;
   onCancel: () => void;
+  onDelete: () => void;
 }
 
 function UploadingFileComponent({
   fileInfo,
   pendingFile,
   onCancel,
+  onDelete,
 }: UploadingFileComponentProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const isImage = pendingFile._fileObj.type.includes('image');
@@ -95,9 +98,17 @@ function UploadingFileComponent({
             {filesize(pendingFile.size) as string}
           </Typography>
         </Box>
-        <IconButton css={cancelButton} onClick={onCancel}>
-          <Cancel />
-        </IconButton>
+        {fileInfo.status === 'waiting' ||
+          (fileInfo.status === 'in_progress' && (
+            <IconButton css={actionButton} onClick={onCancel}>
+              <Cancel />
+            </IconButton>
+          ))}
+        {fileInfo.status === 'error' && (
+          <IconButton css={actionButton} onClick={onDelete}>
+            <DeleteIcon />
+          </IconButton>
+        )}
       </Box>
     </Paper>
   );

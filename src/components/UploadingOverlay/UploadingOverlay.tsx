@@ -20,6 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
+  deleteFailedFile,
   setUploadingOverlayOpen,
   uploadingInfoSelector,
   uploadingOverlayOpenSelector,
@@ -36,7 +37,7 @@ function UploadingOverlay() {
   const { files, totalSize } = useSelector(uploadingInfoSelector);
   const uploadingOverlayOpen = useSelector(uploadingOverlayOpenSelector);
 
-  const { pendingFiles } = useContext(PendingFilesContext);
+  const { setPendingFiles, pendingFiles } = useContext(PendingFilesContext);
   const [expanded, setExpanded] = useState(false);
 
   const filesArr = Object.values(files);
@@ -80,6 +81,19 @@ function UploadingOverlay() {
   }, [files]);
 
   const handleCancelUpload = () => {};
+
+  const handleDeleteFile = (fileId: string) => () => {
+    dispatch(deleteFailedFile(fileId));
+    setPendingFiles((prevFiles) => {
+      const newFiles = { ...prevFiles };
+      delete newFiles[fileId];
+      return newFiles;
+    });
+
+    if (filesArr.length === 1 && filesArr[0]._id === fileId) {
+      setExpanded(false);
+    }
+  };
 
   const handleCloseOverlay = () => {
     dispatch(setUploadingOverlayOpen(!uploadingOverlayOpen));
@@ -133,6 +147,7 @@ function UploadingOverlay() {
               fileInfo={files[id]}
               pendingFile={pendingFiles[id]}
               onCancel={handleCancelUpload}
+              onDelete={handleDeleteFile(id)}
             />
           ))}
         </AccordionDetails>
