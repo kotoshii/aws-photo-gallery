@@ -10,6 +10,13 @@ export const store = configureStore({
     common: commonReducer,
     files: filesReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ['files/uploadFiles/fulfilled'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

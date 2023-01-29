@@ -14,6 +14,7 @@ import { File as FileModel } from '@models';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
 import {
+  ActiveUploadsMap,
   FileUploadingInfo,
   UploadingInfo,
   UploadingStatus,
@@ -49,43 +50,47 @@ const initialState: FilesState = {
   },
 };
 
-async function uploadFileToS3(
+function uploadFileToS3(
   file: PendingFile,
   dispatch: ThunkDispatch<any, any, AnyAction>,
+  onCompleteOrError: (fileId: string) => void,
 ) {
-  try {
-    const ext = file._fileObj.name.split('.').pop();
-    const filename = `${nanoid()}-${file.filename || nanoid()}${
-      ext && file.filename.endsWith(ext) ? '' : `.${ext}`
-    }`;
-    dispatch(
-      filesSlice.actions.setUploadingStatus({
-        fileId: file._id,
-        status: 'in_progress',
-      }),
-    );
-    await Storage.put(filename, file._fileObj, {
-      progressCallback: ({ loaded }) => {
-        dispatch(
-          filesSlice.actions.setUploadingProgress({ fileId: file._id, loaded }),
-        );
-      },
-    });
-    dispatch(
-      filesSlice.actions.setUploadingStatus({
-        fileId: file._id,
-        status: 'completed',
-      }),
-    );
-  } catch (e) {
-    console.log(e);
-    dispatch(
-      filesSlice.actions.setUploadingStatus({
-        fileId: file._id,
-        status: 'error',
-      }),
-    );
-  }
+  const ext = file._fileObj.name.split('.').pop();
+  const filename = `${nanoid()}-${file.filename || nanoid()}${
+    ext && file.filename.endsWith(ext) ? '' : `.${ext}`
+  }`;
+  dispatch(
+    filesSlice.actions.setUploadingStatus({
+      fileId: file._id,
+      status: 'in_progress',
+    }),
+  );
+  return Storage.put(filename, file._fileObj, {
+    resumable: true,
+    progressCallback: ({ loaded }) => {
+      dispatch(
+        filesSlice.actions.setUploadingProgress({ fileId: file._id, loaded }),
+      );
+    },
+    completeCallback: () => {
+      dispatch(
+        filesSlice.actions.setUploadingStatus({
+          fileId: file._id,
+          status: 'completed',
+        }),
+      );
+      onCompleteOrError(file._id);
+    },
+    errorCallback: () => {
+      dispatch(
+        filesSlice.actions.setUploadingStatus({
+          fileId: file._id,
+          status: 'error',
+        }),
+      );
+      onCompleteOrError(file._id);
+    },
+  });
 }
 
 export const filesStateSelector = (state: RootState) => state.files;
@@ -131,35 +136,40 @@ export const updateUserAvatar = createAsyncThunk(
   },
 );
 
-export const uploadFiles = createAsyncThunk(
-  'files/uploadFiles',
-  async (files: PendingFile[], { dispatch }) => {
-    const totalSize = files.reduce((total, { size }) => total + size, 0);
-    const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
-      (acc, { _id }) => ({
-        ...acc,
-        [_id]: {
-          _id,
-          status: 'waiting',
-          loaded: 0,
-        } as FileUploadingInfo,
-      }),
-      {},
-    );
+export const uploadFiles = createAsyncThunk<
+  ActiveUploadsMap,
+  { files: PendingFile[]; onCompleteOrError: (fileId: string) => void }
+>('files/uploadFiles', async ({ files, onCompleteOrError }, { dispatch }) => {
+  const totalSize = files.reduce((total, { size }) => total + size, 0);
+  const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
+    (acc, { _id, size }) => ({
+      ...acc,
+      [_id]: {
+        _id,
+        size,
+        status: 'waiting',
+        loaded: 0,
+      } as FileUploadingInfo,
+    }),
+    {},
+  );
 
-    const uploadingInfo: UploadingInfo = {
-      files: filesInfo,
-      totalSize,
-    };
+  const uploadingInfo: UploadingInfo = {
+    files: filesInfo,
+    totalSize,
+  };
 
-    dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
-    dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
+  dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
+  dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
 
-    for (const file of files) {
-      void uploadFileToS3(file, dispatch);
-    }
-  },
-);
+  return files.reduce(
+    (acc, file) => ({
+      ...acc,
+      [file._id]: uploadFileToS3(file, dispatch, onCompleteOrError),
+    }),
+    {},
+  );
+});
 
 const filesSlice = createSlice({
   name: 'files',
@@ -207,8 +217,10 @@ const filesSlice = createSlice({
     setUploadingOverlayOpen(state, { payload }: PayloadAction<boolean>) {
       state.uploadOverlayOpen = payload;
     },
-    deleteFailedFile(state, { payload }: PayloadAction<string>) {
+    deleteFileById(state, { payload }: PayloadAction<string>) {
       const newFiles = { ...state.uploadingInfo.files };
+      state.uploadingInfo.totalSize =
+        state.uploadingInfo.totalSize - newFiles[payload].size;
       delete newFiles[payload];
       state.uploadingInfo.files = newFiles;
     },
@@ -222,6 +234,6 @@ export const {
   setPage,
   setUploadDialogOpen,
   setUploadingOverlayOpen,
-  deleteFailedFile,
+  deleteFileById,
 } = filesSlice.actions;
 export default filesSlice.reducer;

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -20,18 +20,27 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  deleteFailedFile,
+  deleteFileById,
   setUploadingOverlayOpen,
   uploadingInfoSelector,
   uploadingOverlayOpenSelector,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
-import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
+import {
+  ActiveUploadsMap,
+  UploadingStatus,
+} from '@interfaces/storage/uploading-info.interface';
 import { ActionIconButton, UploadingFileComponent } from '@components';
 import { PendingFilesContext } from '@contexts/pending-files.context';
 import { useAppDispatch } from '@store';
+import { Storage } from 'aws-amplify';
 
-function UploadingOverlay() {
+interface UploadingOverlayProps {
+  uploads: ActiveUploadsMap;
+  onCancelUpload: (fileId: string) => void;
+}
+
+function UploadingOverlay({ uploads, onCancelUpload }: UploadingOverlayProps) {
   const dispatch = useAppDispatch();
 
   const { files, totalSize } = useSelector(uploadingInfoSelector);
@@ -42,6 +51,12 @@ function UploadingOverlay() {
 
   const filesArr = Object.values(files);
   const ids = Object.keys(files);
+
+  useEffect(() => {
+    if (!filesArr.length) {
+      setExpanded(false);
+    }
+  }, [filesArr]);
 
   const amounts = useMemo(() => {
     const res: Record<UploadingStatus, number> = {
@@ -80,19 +95,21 @@ function UploadingOverlay() {
     return text;
   }, [files]);
 
-  const handleCancelUpload = () => {};
+  const handleCancelUpload = (fileId: string) => () => {
+    const upload = uploads[fileId];
+    if (upload) {
+      Storage.cancel(upload);
+      onCancelUpload(fileId);
+    }
+  };
 
   const handleDeleteFile = (fileId: string) => () => {
-    dispatch(deleteFailedFile(fileId));
+    dispatch(deleteFileById(fileId));
     setPendingFiles((prevFiles) => {
       const newFiles = { ...prevFiles };
       delete newFiles[fileId];
       return newFiles;
     });
-
-    if (filesArr.length === 1 && filesArr[0]._id === fileId) {
-      setExpanded(false);
-    }
   };
 
   const handleCloseOverlay = () => {
@@ -146,7 +163,7 @@ function UploadingOverlay() {
               key={id}
               fileInfo={files[id]}
               pendingFile={pendingFiles[id]}
-              onCancel={handleCancelUpload}
+              onCancel={handleCancelUpload(id)}
               onDelete={handleDeleteFile(id)}
             />
           ))}

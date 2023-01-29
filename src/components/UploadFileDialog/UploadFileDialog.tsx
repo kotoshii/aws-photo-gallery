@@ -12,7 +12,6 @@ import { useAppDispatch } from '@store';
 import {
   setUploadDialogOpen,
   uploadDialogOpenSelector,
-  uploadFiles,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { dialogActions, dialogContent } from './styles';
@@ -25,7 +24,11 @@ import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
 import { PendingFilesContext } from '@contexts/pending-files.context';
 
-function UploadFileDialog() {
+interface UploadFileDialogProps {
+  onUpload: (filesArr: PendingFile[]) => void;
+}
+
+function UploadFileDialog({ onUpload }: UploadFileDialogProps) {
   const dispatch = useAppDispatch();
   const open = useSelector(uploadDialogOpenSelector);
 
@@ -105,7 +108,7 @@ function UploadFileDialog() {
 
   const handleUploadClick = () => {
     setGlobalPendingFiles((prevFiles) => ({ ...prevFiles, ...pendingFiles }));
-    dispatch(uploadFiles(filesArr));
+    onUpload(filesArr);
     dispatch(setUploadDialogOpen(false));
     setPendingFiles({});
   };
