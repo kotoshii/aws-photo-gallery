@@ -5,7 +5,7 @@ export const uploadingOverlayWrapper = css`
   bottom: 32px;
   left: 32px;
   display: flex;
-  transition: left 0.5s;
+  transition: left 0.25s;
 `;
 
 export const uploadingOverlayHidden = css`
@@ -20,11 +20,12 @@ export const uploadingOverlay = (expanded: boolean) => css`
   background-color: #f8f9fa;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
 
+  max-height: calc(100% - 32px - 24px - 96px - 16px);
+  z-index: 1;
+
   &:before {
     display: none;
   }
-
-  max-height: calc(100% - 32px - 24px - 96px - 16px);
 `;
 
 export const linearProgress = css`
