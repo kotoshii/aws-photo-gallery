@@ -156,7 +156,7 @@ export const uploadFiles = createAsyncThunk(
     dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
 
     for (const file of files) {
-      // void uploadFileToS3(file, dispatch);
+      void uploadFileToS3(file, dispatch);
     }
   },
 );

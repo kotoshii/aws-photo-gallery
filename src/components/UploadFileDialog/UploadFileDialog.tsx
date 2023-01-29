@@ -30,7 +30,12 @@ function UploadFileDialog() {
   const open = useSelector(uploadDialogOpenSelector);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const { pendingFiles, setPendingFiles } = useContext(PendingFilesContext);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>(
+    {},
+  );
+
+  const { setPendingFiles: setGlobalPendingFiles } =
+    useContext(PendingFilesContext);
 
   const filesArr = Object.values(pendingFiles);
 
@@ -99,8 +104,10 @@ function UploadFileDialog() {
   };
 
   const handleUploadClick = () => {
+    setGlobalPendingFiles((prevFiles) => ({ ...prevFiles, ...pendingFiles }));
     dispatch(uploadFiles(filesArr));
     dispatch(setUploadDialogOpen(false));
+    setPendingFiles({});
   };
 
   return (
