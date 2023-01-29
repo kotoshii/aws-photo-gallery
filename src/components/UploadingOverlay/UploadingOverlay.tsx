@@ -8,7 +8,7 @@ import {
   LinearProgress,
   Typography,
 } from '@mui/material';
-import { linearProgress, uploadingOverlay } from './styles';
+import { accordionDetails, linearProgress, uploadingOverlay } from './styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   isUploadingSelector,
@@ -16,7 +16,7 @@ import {
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { UploadingStatus } from '@interfaces/storage/uploading-info.interface';
-import UploadingFileComponent from '../UploadingFileComponent/UploadingFileComponent';
+import { UploadingFileComponent } from '@components';
 import { PendingFilesContext } from '@contexts/pending-files.context';
 
 function UploadingOverlay() {
@@ -87,7 +87,7 @@ function UploadingOverlay() {
           </Box>
         </Box>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails css={accordionDetails}>
         {ids.map((id) => (
           <UploadingFileComponent
             key={id}

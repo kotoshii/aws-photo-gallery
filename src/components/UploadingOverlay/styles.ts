@@ -12,10 +12,17 @@ export const uploadingOverlay = css`
   &:before {
     display: none;
   }
+
+  max-height: calc(100% - 32px - 24px - 96px - 16px);
 `;
 
 export const linearProgress = css`
   border-radius: 4px;
   height: 8px;
   flex-grow: 1;
+`;
+
+export const accordionDetails = css`
+  overflow-y: auto;
+  max-height: calc(100vh - 64px - 96px - 16px - 68.02px);
 `;
