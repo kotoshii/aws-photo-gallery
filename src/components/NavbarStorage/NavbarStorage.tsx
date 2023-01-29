@@ -15,13 +15,11 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { actionButton, uploadButton } from './styles';
 import { useAppDispatch } from '@store';
 import {
-  isUploadingSelector,
   setUploadDialogOpen,
   showFavoritesSelector,
   showOfflineSelector,
   toggleShowFavorites,
   toggleShowOffline,
-  uploadingInfoSelector,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 
@@ -32,7 +30,6 @@ function NavbarStorage() {
 
   const showFavorites = useSelector(showFavoritesSelector);
   const showOffline = useSelector(showOfflineSelector);
-  const uploading = useSelector(isUploadingSelector);
 
   const handleFiltersClick = (event: React.MouseEvent<HTMLElement>) => {
     setFiltersDropdownAnchor(event.currentTarget);
@@ -82,7 +79,6 @@ function NavbarStorage() {
         variant="contained"
         css={uploadButton}
         onClick={handleUploadDialogButtonClick}
-        disabled={uploading}
       >
         upload new file
       </Button>
