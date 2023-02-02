@@ -13,10 +13,11 @@ type EagerFile = {
   readonly id: string;
   readonly s3key: string;
   readonly filename: string;
-  readonly isFavorite?: boolean | null;
+  readonly isFavorite: boolean;
+  readonly description?: string | null;
+  readonly owner: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly description?: string | null;
 }
 
 type LazyFile = {
@@ -26,10 +27,11 @@ type LazyFile = {
   readonly id: string;
   readonly s3key: string;
   readonly filename: string;
-  readonly isFavorite?: boolean | null;
+  readonly isFavorite: boolean;
+  readonly description?: string | null;
+  readonly owner: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly description?: string | null;
 }
 
 export declare type File = LazyLoading extends LazyLoadingDisabled ? EagerFile : LazyFile

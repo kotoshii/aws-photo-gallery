@@ -9,7 +9,7 @@ import {
 import { RootState } from '@store';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
 import { FIFTY_MB } from '@constants/common';
-import { Storage } from 'aws-amplify';
+import { DataStore, Storage } from 'aws-amplify';
 import { File as FileModel } from '@models';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
@@ -54,6 +54,7 @@ function uploadFileToS3(
   file: PendingFile,
   dispatch: ThunkDispatch<any, any, AnyAction>,
   onCompleteOrError: (fileId: string) => void,
+  owner: string,
 ) {
   const ext = file._fileObj.name.split('.').pop();
   const filename = `${nanoid()}-${file.filename || nanoid()}${
@@ -72,14 +73,34 @@ function uploadFileToS3(
         filesSlice.actions.setUploadingProgress({ fileId: file._id, loaded }),
       );
     },
-    completeCallback: () => {
-      dispatch(
-        filesSlice.actions.setUploadingStatus({
-          fileId: file._id,
-          status: 'completed',
-        }),
-      );
-      onCompleteOrError(file._id);
+    completeCallback: async ({ key }) => {
+      try {
+        await DataStore.save<FileModel>(
+          new FileModel({
+            filename: file.filename,
+            s3key: key as string,
+            description: file.description,
+            isFavorite: false,
+            owner,
+          }),
+        );
+        dispatch(
+          filesSlice.actions.setUploadingStatus({
+            fileId: file._id,
+            status: 'completed',
+          }),
+        );
+        onCompleteOrError(file._id);
+      } catch (e) {
+        dispatch(
+          filesSlice.actions.setUploadingStatus({
+            fileId: file._id,
+            status: 'error',
+          }),
+        );
+        await Storage.remove(key as string);
+        onCompleteOrError(file._id);
+      }
     },
     errorCallback: () => {
       dispatch(
@@ -139,37 +160,47 @@ export const updateUserAvatar = createAsyncThunk(
 export const uploadFiles = createAsyncThunk<
   ActiveUploadsMap,
   { files: PendingFile[]; onCompleteOrError: (fileId: string) => void }
->('files/uploadFiles', async ({ files, onCompleteOrError }, { dispatch }) => {
-  const totalSize = files.reduce((total, { size }) => total + size, 0);
-  const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
-    (acc, { _id, size }) => ({
-      ...acc,
-      [_id]: {
-        _id,
-        size,
-        status: 'waiting',
-        loaded: 0,
-      } as FileUploadingInfo,
-    }),
-    {},
-  );
+>(
+  'files/uploadFiles',
+  async ({ files, onCompleteOrError }, { dispatch, getState }) => {
+    const state = getState() as RootState;
 
-  const uploadingInfo: UploadingInfo = {
-    files: filesInfo,
-    totalSize,
-  };
+    const totalSize = files.reduce((total, { size }) => total + size, 0);
+    const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
+      (acc, { _id, size }) => ({
+        ...acc,
+        [_id]: {
+          _id,
+          size,
+          status: 'waiting',
+          loaded: 0,
+        } as FileUploadingInfo,
+      }),
+      {},
+    );
 
-  dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
-  dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
+    const uploadingInfo: UploadingInfo = {
+      files: filesInfo,
+      totalSize,
+    };
 
-  return files.reduce(
-    (acc, file) => ({
-      ...acc,
-      [file._id]: uploadFileToS3(file, dispatch, onCompleteOrError),
-    }),
-    {},
-  );
-});
+    dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
+    dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
+
+    return files.reduce(
+      (acc, file) => ({
+        ...acc,
+        [file._id]: uploadFileToS3(
+          file,
+          dispatch,
+          onCompleteOrError,
+          state.auth.user?.id as string,
+        ),
+      }),
+      {},
+    );
+  },
+);
 
 const filesSlice = createSlice({
   name: 'files',

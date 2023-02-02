@@ -1,26 +1,12 @@
 {
   "api": {
     "awsphotogallery": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "awsphotogallery72c47f2a"
-        }
-      ],
+      "dependsOn": [],
       "output": {
         "authConfig": {
           "additionalAuthenticationProviders": [
             {
               "authenticationType": "AWS_IAM"
-            },
-            {
-              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-              "userPoolConfig": {
-                "userPoolId": "authawsphotogallery72c47f2a"
-              }
             }
           ],
           "defaultAuthentication": {
@@ -65,6 +51,7 @@
       "service": "Cognito"
     }
   },
+  "function": {},
   "storage": {
     "s3awsphotogallerystorage0551dbd2": {
       "dependsOn": [],
