@@ -54,7 +54,6 @@ function uploadFileToS3(
   file: PendingFile,
   dispatch: ThunkDispatch<any, any, AnyAction>,
   onCompleteOrError: (fileId: string) => void,
-  owner: string,
 ) {
   const ext = file._fileObj.name.split('.').pop();
   const filename = `${nanoid()}-${file.filename || nanoid()}${
@@ -81,7 +80,6 @@ function uploadFileToS3(
             s3key: key as string,
             description: file.description,
             isFavorite: false,
-            owner,
           }),
         );
         dispatch(
@@ -160,47 +158,37 @@ export const updateUserAvatar = createAsyncThunk(
 export const uploadFiles = createAsyncThunk<
   ActiveUploadsMap,
   { files: PendingFile[]; onCompleteOrError: (fileId: string) => void }
->(
-  'files/uploadFiles',
-  async ({ files, onCompleteOrError }, { dispatch, getState }) => {
-    const state = getState() as RootState;
+>('files/uploadFiles', async ({ files, onCompleteOrError }, { dispatch }) => {
+  const totalSize = files.reduce((total, { size }) => total + size, 0);
+  const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
+    (acc, { _id, size }) => ({
+      ...acc,
+      [_id]: {
+        _id,
+        size,
+        status: 'waiting',
+        loaded: 0,
+      } as FileUploadingInfo,
+    }),
+    {},
+  );
 
-    const totalSize = files.reduce((total, { size }) => total + size, 0);
-    const filesInfo = files.reduce<Record<string, FileUploadingInfo>>(
-      (acc, { _id, size }) => ({
-        ...acc,
-        [_id]: {
-          _id,
-          size,
-          status: 'waiting',
-          loaded: 0,
-        } as FileUploadingInfo,
-      }),
-      {},
-    );
+  const uploadingInfo: UploadingInfo = {
+    files: filesInfo,
+    totalSize,
+  };
 
-    const uploadingInfo: UploadingInfo = {
-      files: filesInfo,
-      totalSize,
-    };
+  dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
+  dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
 
-    dispatch(filesSlice.actions.setUploadingInfo(uploadingInfo));
-    dispatch(filesSlice.actions.setUploadingOverlayOpen(true));
-
-    return files.reduce(
-      (acc, file) => ({
-        ...acc,
-        [file._id]: uploadFileToS3(
-          file,
-          dispatch,
-          onCompleteOrError,
-          state.auth.user?.id as string,
-        ),
-      }),
-      {},
-    );
-  },
-);
+  return files.reduce(
+    (acc, file) => ({
+      ...acc,
+      [file._id]: uploadFileToS3(file, dispatch, onCompleteOrError),
+    }),
+    {},
+  );
+});
 
 const filesSlice = createSlice({
   name: 'files',

@@ -17,6 +17,9 @@
       },
       "storage": {
         "s3awsphotogallerystorage0551dbd2": {}
+      },
+      "api": {
+        "awsphotogallery": {}
       }
     }
   }

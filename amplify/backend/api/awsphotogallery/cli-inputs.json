@@ -4,9 +4,8 @@
     "apiName": "awsphotogallery",
     "serviceName": "AppSync",
     "defaultAuthType": {
-      "mode": "API_KEY",
-      "keyDescription": "api key description",
-      "expirationTime": 30
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "authawsphotogallery72c47f2a"
     },
     "additionalAuthTypes": [
       {

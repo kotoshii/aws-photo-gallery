@@ -1,11 +1,11 @@
-type File @model @auth(rules: [{allow: public}]) {
+type File @model @auth(rules: [{allow: owner}]) {
   id: ID!
   s3key: String!
   filename: String!
   isFavorite: Boolean!
   description: String
-  owner: ID!
-  createdAt: String
+  owner: ID
   updatedAt: String
+  createdAt: String
 }
  
