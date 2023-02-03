@@ -16,3 +16,5 @@ export { default as EditableTitle } from './EditableTitle/EditableTitle';
 export { default as ConfirmationModal } from './ConfirmationModal/ConfirmationModal';
 export { default as UploadingOverlay } from './UploadingOverlay/UploadingOverlay';
 export { default as UploadingFileComponent } from './UploadingFileComponent/UploadingFileComponent';
+export { default as FilesList } from './FilesList/FilesList';
+export { default as FilesListItem } from './FilesListItem/FilesListItem';

@@ -8,8 +8,8 @@ import {
 } from '@reduxjs/toolkit';
 import { RootState } from '@store';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
-import { FIFTY_MB } from '@constants/common';
-import { DataStore, Storage } from 'aws-amplify';
+import { FIFTY_MB, PAGE_LIMIT } from '@constants/common';
+import { DataStore, Predicates, Storage } from 'aws-amplify';
 import { File as FileModel } from '@models';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
@@ -23,12 +23,13 @@ import {
 export interface FilesState {
   showFavorites: boolean;
   showOffline: boolean;
-  data: FileModel[];
+  data: Record<string, FileModel>;
   filters: FileFilters;
   page: number;
   uploadDialogOpen: boolean;
   uploadOverlayOpen: boolean;
   uploadingInfo: UploadingInfo;
+  loading: boolean;
 }
 
 const initialState: FilesState = {
@@ -40,7 +41,7 @@ const initialState: FilesState = {
     sizeFrom: 0,
     sizeTo: FIFTY_MB,
   },
-  data: [],
+  data: {},
   page: 1,
   uploadDialogOpen: false,
   uploadOverlayOpen: false,
@@ -48,6 +49,7 @@ const initialState: FilesState = {
     files: {},
     totalSize: 0,
   },
+  loading: false,
 };
 
 function uploadFileToS3(
@@ -190,6 +192,22 @@ export const uploadFiles = createAsyncThunk<
   );
 });
 
+export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
+  'files/fetchFiles',
+  async (_, { getState }) => {
+    const {
+      files: { filters, page },
+    } = getState() as RootState;
+
+    const files = await DataStore.query(FileModel, Predicates.ALL, {
+      page: page - 1,
+      limit: PAGE_LIMIT,
+    });
+
+    return files.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
+  },
+);
+
 const filesSlice = createSlice({
   name: 'files',
   initialState,
@@ -243,6 +261,21 @@ const filesSlice = createSlice({
       delete newFiles[payload];
       state.uploadingInfo.files = newFiles;
     },
+    setFileData(state, { payload }: PayloadAction<FileModel>) {
+      state.data[payload.id] = { ...payload };
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchFiles.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchFiles.fulfilled, (state, { payload }) => {
+      state.loading = false;
+      state.data = payload;
+    });
+    builder.addCase(fetchFiles.rejected, (state) => {
+      state.loading = false;
+    });
   },
 });
 
@@ -254,5 +287,6 @@ export const {
   setUploadDialogOpen,
   setUploadingOverlayOpen,
   deleteFileById,
+  setFileData,
 } = filesSlice.actions;
 export default filesSlice.reducer;
