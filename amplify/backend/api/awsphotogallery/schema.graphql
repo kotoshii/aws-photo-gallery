@@ -5,7 +5,8 @@ type File @model @auth(rules: [{allow: owner}]) {
   isFavorite: Boolean!
   description: String
   owner: ID
-  updatedAt: String
-  createdAt: String
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+  size: Int
 }
  

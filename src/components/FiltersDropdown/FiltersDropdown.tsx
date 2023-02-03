@@ -109,7 +109,7 @@ function FiltersDropdown({ anchorEl, onClose }: FiltersDropdownProps) {
         </Grid>
         <Grid item xs={12}>
           <DatePicker
-            minDate={dateFrom}
+            minDate={dateFrom?.add(1, 'day')}
             label="Date to"
             value={dateTo}
             onChange={(value) => {

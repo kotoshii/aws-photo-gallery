@@ -82,6 +82,7 @@ function uploadFileToS3(
             s3key: key as string,
             description: file.description,
             isFavorite: false,
+            size: file._fileObj.size,
           }),
         );
         dispatch(
@@ -196,13 +197,24 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
   'files/fetchFiles',
   async (_, { getState }) => {
     const {
-      files: { filters, page },
+      files: {
+        filters: { dateFrom, dateTo, sizeFrom, sizeTo },
+        page,
+      },
     } = getState() as RootState;
 
-    const files = await DataStore.query(FileModel, Predicates.ALL, {
-      page: page - 1,
-      limit: PAGE_LIMIT,
-    });
+    const files = await DataStore.query(
+      FileModel,
+      (c) =>
+        c.or((c) => [
+          c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
+          c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
+        ]),
+      {
+        page: page - 1,
+        limit: PAGE_LIMIT,
+      },
+    );
 
     return files.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
   },

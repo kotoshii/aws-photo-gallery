@@ -18,6 +18,7 @@ type EagerFile = {
   readonly owner?: string | null;
   readonly updatedAt?: string | null;
   readonly createdAt?: string | null;
+  readonly size?: number | null;
 }
 
 type LazyFile = {
@@ -32,6 +33,7 @@ type LazyFile = {
   readonly owner?: string | null;
   readonly updatedAt?: string | null;
   readonly createdAt?: string | null;
+  readonly size?: number | null;
 }
 
 export declare type File = LazyLoading extends LazyLoadingDisabled ? EagerFile : LazyFile

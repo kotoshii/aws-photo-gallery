@@ -8,6 +8,7 @@ import { File } from '@models';
 import { useAppDispatch } from '@store';
 import {
   fetchFiles,
+  filtersSelector,
   pageSelector,
   setFileData,
 } from '@store/slices/files.slice';
@@ -19,6 +20,7 @@ function Homepage() {
   const { enqueueSnackbar } = useSnackbar();
 
   const page = useSelector(pageSelector);
+  const { dateFrom, dateTo, sizeFrom, sizeTo } = useSelector(filtersSelector);
 
   const fetchFilesData = async () => {
     try {
@@ -33,7 +35,7 @@ function Homepage() {
 
   useEffect(() => {
     void fetchFilesData();
-  }, [page]);
+  }, [page, dateFrom, dateTo, sizeFrom, sizeTo]);
 
   useEffect(() => {
     const subscription = DataStore.observe(File, Predicates.ALL).subscribe(
