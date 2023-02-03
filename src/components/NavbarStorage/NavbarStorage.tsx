@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActionIconButton,
   NavbarEmpty,
@@ -7,7 +7,7 @@ import {
   ExpandableAvatarProfile,
   FiltersDropdown,
 } from '@components';
-import { Button, TextField } from '@mui/material';
+import { Button, debounce, IconButton, TextField } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -15,6 +15,8 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { actionButton, uploadButton } from './styles';
 import { useAppDispatch } from '@store';
 import {
+  resetSearchBarHookSelector,
+  setFilesFilters,
   setUploadDialogOpen,
   showFavoritesSelector,
   showOfflineSelector,
@@ -22,14 +24,31 @@ import {
   toggleShowOffline,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
+import { Close } from '@mui/icons-material';
 
 function NavbarStorage() {
   const dispatch = useAppDispatch();
   const [filtersDropdownAnchor, setFiltersDropdownAnchor] =
     useState<HTMLElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const showFavorites = useSelector(showFavoritesSelector);
   const showOffline = useSelector(showOfflineSelector);
+  const resetSearchBarHook = useSelector(resetSearchBarHookSelector);
+
+  const debouncedSearchChange = useMemo(
+    () =>
+      debounce((search: string) => {
+        dispatch(setFilesFilters({ search }));
+      }, 500),
+    [],
+  );
+
+  useEffect(() => {
+    if (searchQuery) {
+      setSearchQuery('');
+    }
+  }, [resetSearchBarHook]);
 
   const handleFiltersClick = (event: React.MouseEvent<HTMLElement>) => {
     setFiltersDropdownAnchor(event.currentTarget);
@@ -51,9 +70,26 @@ function NavbarStorage() {
     dispatch(setUploadDialogOpen(true));
   };
 
+  const handleSearchQueryChange = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearchChange(query);
+  };
+
   return (
     <NavbarEmpty>
-      <TextField placeholder="Search..." sx={{ width: 400 }} />
+      <TextField
+        placeholder="Search..."
+        sx={{ width: 400 }}
+        value={searchQuery}
+        onChange={(e) => handleSearchQueryChange(e.target.value)}
+        InputProps={{
+          endAdornment: searchQuery ? (
+            <IconButton onClick={() => handleSearchQueryChange('')}>
+              <Close />
+            </IconButton>
+          ) : null,
+        }}
+      />
       <ActionIconButton
         icon={<FilterAltIcon />}
         onClick={handleFiltersClick}

@@ -9,7 +9,7 @@ import {
 import { RootState } from '@store';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
 import { FIFTY_MB, PAGE_LIMIT } from '@constants/common';
-import { DataStore, Predicates, Storage } from 'aws-amplify';
+import { DataStore, Storage } from 'aws-amplify';
 import { File as FileModel } from '@models';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { nanoid } from 'nanoid';
@@ -30,6 +30,7 @@ export interface FilesState {
   uploadOverlayOpen: boolean;
   uploadingInfo: UploadingInfo;
   loading: boolean;
+  _resetSearchBarHook: number;
 }
 
 const initialState: FilesState = {
@@ -40,6 +41,7 @@ const initialState: FilesState = {
     dateTo: null,
     sizeFrom: 0,
     sizeTo: FIFTY_MB,
+    search: '',
   },
   data: {},
   page: 1,
@@ -50,6 +52,7 @@ const initialState: FilesState = {
     totalSize: 0,
   },
   loading: false,
+  _resetSearchBarHook: 0,
 };
 
 function uploadFileToS3(
@@ -149,6 +152,10 @@ export const uploadingOverlayOpenSelector = createSelector(
   filesStateSelector,
   (state) => state.uploadOverlayOpen,
 );
+export const resetSearchBarHookSelector = createSelector(
+  filesStateSelector,
+  (state) => state._resetSearchBarHook,
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -198,7 +205,7 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
   async (_, { getState }) => {
     const {
       files: {
-        filters: { dateFrom, dateTo, sizeFrom, sizeTo },
+        filters: { dateFrom, dateTo, sizeFrom, sizeTo, search },
         page,
       },
     } = getState() as RootState;
@@ -206,9 +213,12 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
     const files = await DataStore.query(
       FileModel,
       (c) =>
-        c.or((c) => [
-          c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
-          c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
+        c.and((c) => [
+          c.filename.contains(search),
+          c.or((c) => [
+            c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
+            c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
+          ]),
         ]),
       {
         page: page - 1,
@@ -226,6 +236,9 @@ const filesSlice = createSlice({
   reducers: {
     setFilesFilters(state, { payload }: PayloadAction<Partial<FileFilters>>) {
       state.filters = { ...state.filters, ...payload };
+    },
+    resetFilesFilters(state) {
+      state.filters = initialState.filters;
     },
     toggleShowFavorites(state) {
       state.showFavorites = !state.showFavorites;
@@ -274,7 +287,10 @@ const filesSlice = createSlice({
       state.uploadingInfo.files = newFiles;
     },
     setFileData(state, { payload }: PayloadAction<FileModel>) {
-      state.data[payload.id] = { ...payload };
+      state.data[payload.id] = payload;
+    },
+    resetSearchBar(state) {
+      state._resetSearchBarHook = state._resetSearchBarHook + 1;
     },
   },
   extraReducers: (builder) => {
@@ -300,5 +316,7 @@ export const {
   setUploadingOverlayOpen,
   deleteFileById,
   setFileData,
+  resetFilesFilters,
+  resetSearchBar,
 } = filesSlice.actions;
 export default filesSlice.reducer;

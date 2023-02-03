@@ -20,7 +20,8 @@ function Homepage() {
   const { enqueueSnackbar } = useSnackbar();
 
   const page = useSelector(pageSelector);
-  const { dateFrom, dateTo, sizeFrom, sizeTo } = useSelector(filtersSelector);
+  const { dateFrom, dateTo, sizeFrom, sizeTo, search } =
+    useSelector(filtersSelector);
 
   const fetchFilesData = async () => {
     try {
@@ -35,7 +36,7 @@ function Homepage() {
 
   useEffect(() => {
     void fetchFilesData();
-  }, [page, dateFrom, dateTo, sizeFrom, sizeTo]);
+  }, [page, dateFrom, dateTo, sizeFrom, sizeTo, search]);
 
   useEffect(() => {
     const subscription = DataStore.observe(File, Predicates.ALL).subscribe(

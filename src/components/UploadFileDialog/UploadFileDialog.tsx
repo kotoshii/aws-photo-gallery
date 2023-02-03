@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { useAppDispatch } from '@store';
 import {
+  resetFilesFilters,
+  resetSearchBar,
   setUploadDialogOpen,
   uploadDialogOpenSelector,
 } from '@store/slices/files.slice';
@@ -110,6 +112,8 @@ function UploadFileDialog({ onUpload }: UploadFileDialogProps) {
     setGlobalPendingFiles((prevFiles) => ({ ...prevFiles, ...pendingFiles }));
     onUpload(filesArr);
     dispatch(setUploadDialogOpen(false));
+    dispatch(resetFilesFilters());
+    dispatch(resetSearchBar());
     setPendingFiles({});
   };
 

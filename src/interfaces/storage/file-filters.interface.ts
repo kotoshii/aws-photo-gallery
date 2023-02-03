@@ -3,4 +3,5 @@ export interface FileFilters {
   dateTo: string | null;
   sizeFrom: number;
   sizeTo: number;
+  search: string;
 }
