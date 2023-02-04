@@ -48,7 +48,7 @@ function ConfirmationModal({
   };
 
   return (
-    <Dialog onClose={onClose} open={open}>
+    <Dialog onClose={onClose} open={open} fullWidth>
       <DialogTitle>Confirm action</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>

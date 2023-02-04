@@ -12,7 +12,10 @@ import {
 import { navbarLayout } from './styles';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { PendingFilesContext } from '@contexts/pending-files.context';
-import { deleteFileById, uploadFiles } from '@store/slices/files.slice';
+import {
+  deleteUploadingFileById,
+  uploadFiles,
+} from '@store/slices/files.slice';
 import { useAppDispatch } from '@store';
 import { ActiveUploadsMap } from '@interfaces/storage/uploading-info.interface';
 
@@ -42,7 +45,7 @@ function NavbarLayout() {
 
   const handleCancelUpload = (fileId: string) => {
     removeFinishedUpload(fileId);
-    dispatch(deleteFileById(fileId));
+    dispatch(deleteUploadingFileById(fileId));
     setPendingFiles((prevFiles) => {
       const newFiles = { ...prevFiles };
       delete newFiles[fileId];

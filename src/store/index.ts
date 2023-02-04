@@ -12,10 +12,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        // Ignore these action types
-        ignoredActions: ['files/uploadFiles/fulfilled'],
-      },
+      serializableCheck: false,
     }),
 });
 

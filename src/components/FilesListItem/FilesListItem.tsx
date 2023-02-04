@@ -29,7 +29,7 @@ import {
 } from '@mui/icons-material';
 import mime from 'mime';
 import { File as FileModel } from '@models';
-import FileItemMenu from '../FileItemMenu/FileItemMenu';
+import { FileItemMenu } from '@components';
 
 interface FilesListItemProps {
   file: FileModel;
@@ -50,8 +50,9 @@ function FilesListItem({ file }: FilesListItemProps) {
   const getUrl = async () => {
     setLoading(true);
     try {
-      // await new Promise((resolve, reject) => setTimeout(resolve, 2000));
-      const url = await dispatch(getUrlByKey(s3key)).unwrap();
+      const url = await dispatch(
+        getUrlByKey({ key: s3key, filename }),
+      ).unwrap();
       setUrl(url);
     } catch (e) {
       enqueueSnackbar('Error while loading image preview.', {
@@ -81,9 +82,7 @@ function FilesListItem({ file }: FilesListItemProps) {
   };
 
   useEffect(() => {
-    if (isImage) {
-      void getUrl();
-    }
+    void getUrl();
   }, []);
 
   return (
@@ -133,7 +132,11 @@ function FilesListItem({ file }: FilesListItemProps) {
           </Box>
         </CardActions>
       </Card>
-      <FileItemMenu onClose={() => setMenuAnchor(null)} anchor={menuAnchor} />
+      <FileItemMenu
+        onClose={() => setMenuAnchor(null)}
+        anchor={menuAnchor}
+        file={file}
+      />
     </>
   );
 }

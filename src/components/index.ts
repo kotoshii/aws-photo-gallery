@@ -18,3 +18,5 @@ export { default as UploadingOverlay } from './UploadingOverlay/UploadingOverlay
 export { default as UploadingFileComponent } from './UploadingFileComponent/UploadingFileComponent';
 export { default as FilesList } from './FilesList/FilesList';
 export { default as FilesListItem } from './FilesListItem/FilesListItem';
+export { default as FileItemMenu } from './FileItemMenu/FileItemMenu';
+export { default as RenameDialog } from './RenameDialog/RenameDialog';

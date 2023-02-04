@@ -160,6 +160,10 @@ export const filesDataSelector = createSelector(
   filesStateSelector,
   (state) => state.data,
 );
+export const fileDataSelector = createSelector(
+  [filesDataSelector, (state, fileId: string) => fileId],
+  (data, fileId) => data[fileId],
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -236,17 +240,21 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
   },
 );
 
-export const getUrlByKey = createAsyncThunk(
-  'files/getUrlByKey',
-  async (key: string) => {
-    return await Storage.get(key);
-  },
-);
+export const getUrlByKey = createAsyncThunk<
+  string,
+  { key: string; filename?: string }
+>('files/getUrlByKey', async ({ key, filename }) => {
+  return await Storage.get(key, {
+    contentDisposition: filename
+      ? `attachment; filename=${encodeURIComponent(filename)}`
+      : undefined,
+  });
+});
 
 export const toggleIsFavorite = createAsyncThunk<
   void,
   { id: string; isFavorite: boolean }
->('files/addToFavorites', async ({ id, isFavorite }) => {
+>('files/toggleIsFavorite', async ({ id, isFavorite }) => {
   const original = await DataStore.query(FileModel, id);
   if (original) {
     await DataStore.save(
@@ -256,6 +264,28 @@ export const toggleIsFavorite = createAsyncThunk<
     );
   }
 });
+
+export const deleteFile = createAsyncThunk<void, { id: string; s3key: string }>(
+  'files/deleteFile',
+  async ({ id, s3key }) => {
+    await Storage.remove(s3key);
+    await DataStore.delete(FileModel, id);
+  },
+);
+
+export const renameFile = createAsyncThunk<void, { id: string; name: string }>(
+  'files/renameFile',
+  async ({ id, name }) => {
+    const original = await DataStore.query(FileModel, id);
+    if (original) {
+      await DataStore.save(
+        FileModel.copyOf(original, (updated) => {
+          updated.filename = name;
+        }),
+      );
+    }
+  },
+);
 
 const filesSlice = createSlice({
   name: 'files',
@@ -306,7 +336,7 @@ const filesSlice = createSlice({
     setUploadingOverlayOpen(state, { payload }: PayloadAction<boolean>) {
       state.uploadOverlayOpen = payload;
     },
-    deleteFileById(state, { payload }: PayloadAction<string>) {
+    deleteUploadingFileById(state, { payload }: PayloadAction<string>) {
       const newFiles = { ...state.uploadingInfo.files };
       state.uploadingInfo.totalSize =
         state.uploadingInfo.totalSize - newFiles[payload].size;
@@ -318,6 +348,11 @@ const filesSlice = createSlice({
     },
     resetSearchBar(state) {
       state._resetSearchBarHook = state._resetSearchBarHook + 1;
+    },
+    deleteFileData(state, { payload }: PayloadAction<string>) {
+      const newFileData = { ...state.data };
+      delete newFileData[payload];
+      state.data = newFileData;
     },
   },
   extraReducers: (builder) => {
@@ -341,9 +376,10 @@ export const {
   setPage,
   setUploadDialogOpen,
   setUploadingOverlayOpen,
-  deleteFileById,
+  deleteUploadingFileById,
   setFileData,
   resetFilesFilters,
   resetSearchBar,
+  deleteFileData,
 } = filesSlice.actions;
 export default filesSlice.reducer;

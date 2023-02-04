@@ -20,7 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import {
-  deleteFileById,
+  deleteUploadingFileById,
   setUploadingOverlayOpen,
   uploadingInfoSelector,
   uploadingOverlayOpenSelector,
@@ -104,7 +104,7 @@ function UploadingOverlay({ uploads, onCancelUpload }: UploadingOverlayProps) {
   };
 
   const handleDeleteFile = (fileId: string) => () => {
-    dispatch(deleteFileById(fileId));
+    dispatch(deleteUploadingFileById(fileId));
     setPendingFiles((prevFiles) => {
       const newFiles = { ...prevFiles };
       delete newFiles[fileId];
