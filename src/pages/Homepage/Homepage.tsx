@@ -11,6 +11,7 @@ import {
   filtersSelector,
   pageSelector,
   setFileData,
+  showFavoritesSelector,
 } from '@store/slices/files.slice';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
@@ -22,6 +23,7 @@ function Homepage() {
   const page = useSelector(pageSelector);
   const { dateFrom, dateTo, sizeFrom, sizeTo, search } =
     useSelector(filtersSelector);
+  const showOnlyFavs = useSelector(showFavoritesSelector);
 
   const fetchFilesData = async () => {
     try {
@@ -36,7 +38,7 @@ function Homepage() {
 
   useEffect(() => {
     void fetchFilesData();
-  }, [page, dateFrom, dateTo, sizeFrom, sizeTo, search]);
+  }, [page, dateFrom, dateTo, sizeFrom, sizeTo, search, showOnlyFavs]);
 
   useEffect(() => {
     const subscription = DataStore.observe(File, Predicates.ALL).subscribe(

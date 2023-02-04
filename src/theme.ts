@@ -34,10 +34,21 @@ export const theme = createTheme({
         },
       },
     },
+    MuiList: {
+      styleOverrides: {
+        padding: {
+          padding: 8,
+        },
+      },
+    },
     MuiMenuItem: {
       styleOverrides: {
         root: {
           borderRadius: 12,
+        },
+        gutters: {
+          paddingLeft: 8,
+          paddingRight: 8,
         },
       },
     },

@@ -20,6 +20,7 @@ export const divider = css`
 
 export const menuList = css`
   width: 100%;
+  padding: 0;
 
   & .MuiMenuItem-root {
     height: 40px;

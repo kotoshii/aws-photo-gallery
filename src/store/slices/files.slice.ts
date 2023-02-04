@@ -156,6 +156,10 @@ export const resetSearchBarHookSelector = createSelector(
   filesStateSelector,
   (state) => state._resetSearchBarHook,
 );
+export const filesDataSelector = createSelector(
+  filesStateSelector,
+  (state) => state.data,
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -207,6 +211,7 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
       files: {
         filters: { dateFrom, dateTo, sizeFrom, sizeTo, search },
         page,
+        showFavorites,
       },
     } = getState() as RootState;
 
@@ -219,6 +224,7 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
             c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
             c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
           ]),
+          c.or((c) => [c.isFavorite.eq(true), c.isFavorite.eq(showFavorites)]),
         ]),
       {
         page: page - 1,
@@ -229,6 +235,27 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
     return files.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
   },
 );
+
+export const getUrlByKey = createAsyncThunk(
+  'files/getUrlByKey',
+  async (key: string) => {
+    return await Storage.get(key);
+  },
+);
+
+export const toggleIsFavorite = createAsyncThunk<
+  void,
+  { id: string; isFavorite: boolean }
+>('files/addToFavorites', async ({ id, isFavorite }) => {
+  const original = await DataStore.query(FileModel, id);
+  if (original) {
+    await DataStore.save(
+      FileModel.copyOf(original, (updated) => {
+        updated.isFavorite = isFavorite;
+      }),
+    );
+  }
+});
 
 const filesSlice = createSlice({
   name: 'files',
