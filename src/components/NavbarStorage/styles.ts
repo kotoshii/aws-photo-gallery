@@ -9,5 +9,5 @@ export const actionButton = css`
 export const uploadButton = css`
   height: 56px;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  margin-left: 24px;
+  margin-left: auto;
 `;

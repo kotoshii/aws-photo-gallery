@@ -5,7 +5,7 @@ export const avatar = css`
 `;
 
 export const avatarWrapper = css`
-  margin-left: auto;
+  margin-left: 24px;
 `;
 
 export const popover = css`
