@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { RootState } from '@store';
 import { FileFilters } from '@interfaces/storage/file-filters.interface';
-import { FIFTY_MB, PAGE_LIMIT } from '@constants/common';
+import { FIFTY_MB } from '@constants/common';
 import { DataStore, Storage } from 'aws-amplify';
 import { File as FileModel } from '@models';
 import { PendingFile } from '@interfaces/pending-file.interface';
@@ -25,7 +25,6 @@ export interface FilesState {
   showOffline: boolean;
   data: Record<string, FileModel>;
   filters: FileFilters;
-  page: number;
   uploadDialogOpen: boolean;
   uploadOverlayOpen: boolean;
   uploadingInfo: UploadingInfo;
@@ -44,7 +43,6 @@ const initialState: FilesState = {
     search: '',
   },
   data: {},
-  page: 1,
   uploadDialogOpen: false,
   uploadOverlayOpen: false,
   uploadingInfo: {
@@ -131,10 +129,6 @@ export const showOfflineSelector = createSelector(
   filesStateSelector,
   (state) => state.showOffline,
 );
-export const pageSelector = createSelector(
-  filesStateSelector,
-  (state) => state.page,
-);
 export const uploadDialogOpenSelector = createSelector(
   filesStateSelector,
   (state) => state.uploadDialogOpen,
@@ -142,11 +136,6 @@ export const uploadDialogOpenSelector = createSelector(
 export const uploadingInfoSelector = createSelector(
   filesStateSelector,
   (state) => state.uploadingInfo,
-);
-export const isUploadingSelector = createSelector(filesStateSelector, (state) =>
-  Object.values(state.uploadingInfo.files).some(
-    ({ status }) => status === 'waiting' || status === 'in_progress',
-  ),
 );
 export const uploadingOverlayOpenSelector = createSelector(
   filesStateSelector,
@@ -214,26 +203,19 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
     const {
       files: {
         filters: { dateFrom, dateTo, sizeFrom, sizeTo, search },
-        page,
         showFavorites,
       },
     } = getState() as RootState;
 
-    const files = await DataStore.query(
-      FileModel,
-      (c) =>
-        c.and((c) => [
-          c.filename.contains(search),
-          c.or((c) => [
-            c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
-            c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
-          ]),
-          c.or((c) => [c.isFavorite.eq(true), c.isFavorite.eq(showFavorites)]),
+    const files = await DataStore.query(FileModel, (c) =>
+      c.and((c) => [
+        c.filename.contains(search),
+        c.or((c) => [
+          c.and((c) => [c.createdAt.ge(dateFrom), c.createdAt.le(dateTo)]),
+          c.and((c) => [c.size.ge(sizeFrom), c.size.le(sizeTo)]),
         ]),
-      {
-        page: page - 1,
-        limit: PAGE_LIMIT,
-      },
+        c.or((c) => [c.isFavorite.eq(true), c.isFavorite.eq(showFavorites)]),
+      ]),
     );
 
     return files.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
@@ -303,9 +285,6 @@ const filesSlice = createSlice({
     toggleShowOffline(state) {
       state.showOffline = !state.showOffline;
     },
-    setPage(state, { payload }: PayloadAction<number>) {
-      state.page = payload;
-    },
     setUploadDialogOpen(state, { payload }: PayloadAction<boolean>) {
       state.uploadDialogOpen = payload;
     },
@@ -373,7 +352,6 @@ export const {
   setFilesFilters,
   toggleShowFavorites,
   toggleShowOffline,
-  setPage,
   setUploadDialogOpen,
   setUploadingOverlayOpen,
   deleteUploadingFileById,

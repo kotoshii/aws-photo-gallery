@@ -11,7 +11,6 @@ import {
   deleteFileData,
   fetchFiles,
   filtersSelector,
-  pageSelector,
   setFileData,
   showFavoritesSelector,
 } from '@store/slices/files.slice';
@@ -29,7 +28,6 @@ function Homepage() {
     s3key: string;
   }>({ id: '', s3key: '' });
 
-  const page = useSelector(pageSelector);
   const { dateFrom, dateTo, sizeFrom, sizeTo, search } =
     useSelector(filtersSelector);
   const showOnlyFavs = useSelector(showFavoritesSelector);
@@ -47,7 +45,7 @@ function Homepage() {
 
   useEffect(() => {
     void fetchFilesData();
-  }, [page, dateFrom, dateTo, sizeFrom, sizeTo, search, showOnlyFavs]);
+  }, [dateFrom, dateTo, sizeFrom, sizeTo, search, showOnlyFavs]);
 
   useEffect(() => {
     const subscription = DataStore.observe(File, Predicates.ALL).subscribe(

@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActionIconButton,
   NavbarEmpty,
-  Pagination,
   ExpandableAvatarProfile,
   FiltersDropdown,
 } from '@components';
@@ -108,7 +107,6 @@ function NavbarStorage() {
         css={actionButton}
         active={showOffline}
       />
-      <Pagination />
       <Button
         color="inherit"
         startIcon={<CloudUploadIcon />}
