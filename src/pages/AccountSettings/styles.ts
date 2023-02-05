@@ -2,7 +2,6 @@ import { css } from '@emotion/react';
 
 export const accountSettingsPage = css`
   padding-top: calc(24px + 96px + 32px);
-  margin-bottom: 32px;
 `;
 
 export const accountSettings = css`

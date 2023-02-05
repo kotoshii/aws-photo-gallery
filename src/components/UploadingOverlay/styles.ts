@@ -6,6 +6,7 @@ export const uploadingOverlayWrapper = css`
   left: 32px;
   display: flex;
   transition: left 0.25s;
+  z-index: 10;
 `;
 
 export const uploadingOverlayHidden = css`

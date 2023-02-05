@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { homepage } from './styles';
-import { ConfirmationModal, FilesList, RenameDialog } from '@components';
+import {
+  ConfirmationModal,
+  FileInfoSidebar,
+  FilesList,
+  RenameDialog,
+} from '@components';
 import { DataStore, Predicates } from 'aws-amplify';
 import { File } from '@models';
 import { useAppDispatch } from '@store';
@@ -81,6 +86,7 @@ function Homepage() {
     >
       <Box css={homepage}>
         <FilesList />
+        <FileInfoSidebar />
       </Box>
       <RenameDialog
         open={!!renameFileId}

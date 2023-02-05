@@ -8,4 +8,6 @@ export const navbarLayout = css`
 
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+
+  padding-bottom: 32px;
 `;

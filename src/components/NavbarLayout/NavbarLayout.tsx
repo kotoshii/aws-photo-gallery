@@ -73,7 +73,7 @@ function NavbarLayout() {
           onCancelUpload={handleCancelUpload}
         />
       </PendingFilesContext.Provider>
-      <Box px={4} height={1} width={1} overflow="auto" css={navbarLayout}>
+      <Box px={4} height={1} width={1} css={navbarLayout}>
         <Outlet />
       </Box>
     </>
