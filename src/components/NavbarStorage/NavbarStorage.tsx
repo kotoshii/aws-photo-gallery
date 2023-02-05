@@ -6,7 +6,7 @@ import {
   ExpandableAvatarProfile,
   FiltersDropdown,
 } from '@components';
-import { Button, debounce, IconButton, TextField } from '@mui/material';
+import { Box, Button, debounce, IconButton, TextField } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -107,16 +107,18 @@ function NavbarStorage() {
         css={actionButton}
         active={showOffline}
       />
-      <Button
-        color="inherit"
-        startIcon={<CloudUploadIcon />}
-        variant="contained"
-        css={uploadButton}
-        onClick={handleUploadDialogButtonClick}
-      >
-        upload new file
-      </Button>
-      <ExpandableAvatarProfile />
+      <Box ml="auto" display="flex" justifyContent="center" alignItems="center">
+        <Button
+          color="inherit"
+          startIcon={<CloudUploadIcon />}
+          variant="contained"
+          css={uploadButton}
+          onClick={handleUploadDialogButtonClick}
+        >
+          upload new file
+        </Button>
+        <ExpandableAvatarProfile />
+      </Box>
       <FiltersDropdown
         anchorEl={filtersDropdownAnchor}
         onClose={handleFiltersDropdownClose}
