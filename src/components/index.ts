@@ -20,3 +20,4 @@ export { default as FilesListItem } from './FilesListItem/FilesListItem';
 export { default as FileItemMenu } from './FileItemMenu/FileItemMenu';
 export { default as RenameDialog } from './RenameDialog/RenameDialog';
 export { default as FileInfoSidebar } from './FileInfoSidebar/FileInfoSidebar';
+export { default as FullScreenPreview } from './FullScreenPreview/FullScreenPreview';

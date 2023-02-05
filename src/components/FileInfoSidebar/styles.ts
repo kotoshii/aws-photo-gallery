@@ -36,3 +36,28 @@ export const fileIcon = css`
   width: 48px;
   height: 48px;
 `;
+
+export const backdrop = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity ease-in-out 0.05s;
+  cursor: pointer;
+
+  &:hover {
+    display: flex;
+    opacity: 1;
+  }
+`;
+
+export const eyeIcon = css`
+  width: 90px;
+  height: 90px;
+
+  color: rgba(255, 255, 255, 80%);
+`;

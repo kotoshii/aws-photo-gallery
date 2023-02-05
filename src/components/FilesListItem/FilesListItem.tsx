@@ -17,6 +17,7 @@ import {
   getUrlByKey,
   selectedFileSelector,
   selectFile,
+  setFullscreenFile,
   toggleIsFavorite,
 } from '@store/slices/files.slice';
 import {
@@ -99,6 +100,14 @@ function FilesListItem({ file }: FilesListItemProps) {
     }
   };
 
+  const handleOpenFullscreen = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    if (url) {
+      dispatch(setFullscreenFile({ file, url }));
+    }
+  };
+
   useEffect(() => {
     void getUrl();
   }, []);
@@ -140,7 +149,11 @@ function FilesListItem({ file }: FilesListItemProps) {
           </CardContent>
         )}
         <CardActions>
-          {isImage && <Button variant="text">open</Button>}
+          {isImage && (
+            <Button variant="text" onClick={handleOpenFullscreen}>
+              open
+            </Button>
+          )}
           <Box ml="auto">
             <IconButton onClick={toggleFavorite}>
               <FavoriteOutlined

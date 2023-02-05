@@ -1,22 +1,42 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
 import { Box, Divider, Grid, Paper, Typography } from '@mui/material';
-import { fileIcon, filePreview, filePreviewImage, sidebar } from './styles';
+import {
+  backdrop,
+  eyeIcon,
+  fileIcon,
+  filePreview,
+  filePreviewImage,
+  sidebar,
+} from './styles';
 import { useSelector } from 'react-redux';
-import { selectedFileSelector } from '@store/slices/files.slice';
-import { InsertDriveFileOutlined } from '@mui/icons-material';
+import {
+  setFullscreenFile,
+  selectedFileSelector,
+} from '@store/slices/files.slice';
+import {
+  InsertDriveFileOutlined,
+  VisibilityOutlined,
+} from '@mui/icons-material';
 import { useIsImage } from '@hooks/use-is-image';
 import dayjs from 'dayjs';
 import { filesize } from 'filesize';
+import { useAppDispatch } from '@store';
+import { DATE_FORMAT } from '@constants/common';
 
 interface FilePreviewProps {
   src?: string;
   isImage?: boolean;
+  onFullscreenOpen?: () => void;
 }
 
-const DATE_FORMAT = 'YYYY-MM-DD, HH:mm:ss';
+function FilePreview({ src, isImage, onFullscreenOpen }: FilePreviewProps) {
+  const handleBackdropClick = () => {
+    if (onFullscreenOpen) {
+      onFullscreenOpen();
+    }
+  };
 
-function FilePreview({ src, isImage }: FilePreviewProps) {
   return (
     <Box css={[filePreview, filePreviewImage(src)]}>
       {!src || !isImage ? (
@@ -25,7 +45,11 @@ function FilePreview({ src, isImage }: FilePreviewProps) {
           fontSize="large"
           css={fileIcon}
         />
-      ) : null}
+      ) : (
+        <Box css={backdrop} onClick={handleBackdropClick}>
+          <VisibilityOutlined css={eyeIcon} />
+        </Box>
+      )}
     </Box>
   );
 }
@@ -42,6 +66,8 @@ function SidebarContentPlaceholder() {
 }
 
 function FileInfoSidebar() {
+  const dispatch = useAppDispatch();
+
   const selectedFile = useSelector(selectedFileSelector);
   const { isImage } = useIsImage(selectedFile?.file?.s3key as string);
 
@@ -51,9 +77,17 @@ function FileInfoSidebar() {
 
   const { file, url } = selectedFile;
 
+  const handleFullscreenOpen = () => {
+    dispatch(setFullscreenFile(selectedFile));
+  };
+
   return (
     <Paper css={sidebar} elevation={0}>
-      <FilePreview src={url} isImage={isImage} />
+      <FilePreview
+        src={url}
+        isImage={isImage}
+        onFullscreenOpen={handleFullscreenOpen}
+      />
       <Box overflow="auto">
         <Box mb={2}>
           {file.description ? (

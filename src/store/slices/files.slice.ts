@@ -19,6 +19,7 @@ import {
   UploadingInfo,
   UploadingStatus,
 } from '@interfaces/storage/uploading-info.interface';
+import { FileWithUrl } from '@interfaces/storage/file-with-url.interface';
 
 export interface FilesState {
   showFavorites: boolean;
@@ -30,7 +31,8 @@ export interface FilesState {
   uploadingInfo: UploadingInfo;
   loading: boolean;
   _resetSearchBarHook: number;
-  selectedFile: { file: FileModel; url: string } | null;
+  selectedFile: FileWithUrl | null;
+  fullscreenFile: FileWithUrl | null;
 }
 
 const initialState: FilesState = {
@@ -53,6 +55,7 @@ const initialState: FilesState = {
   loading: false,
   _resetSearchBarHook: 0,
   selectedFile: null,
+  fullscreenFile: null,
 };
 
 function uploadFileToS3(
@@ -158,6 +161,10 @@ export const fileDataSelector = createSelector(
 export const selectedFileSelector = createSelector(
   filesStateSelector,
   (state) => state.selectedFile,
+);
+export const fullscreenFileSelector = createSelector(
+  filesStateSelector,
+  (state) => state.fullscreenFile,
 );
 
 export const updateUserAvatar = createAsyncThunk(
@@ -339,11 +346,11 @@ const filesSlice = createSlice({
       delete newFileData[payload];
       state.data = newFileData;
     },
-    selectFile(
-      state,
-      { payload }: PayloadAction<{ file: FileModel; url: string } | null>,
-    ) {
+    selectFile(state, { payload }: PayloadAction<FileWithUrl | null>) {
       state.selectedFile = payload;
+    },
+    setFullscreenFile(state, { payload }: PayloadAction<FileWithUrl | null>) {
+      state.fullscreenFile = payload;
     },
   },
   extraReducers: (builder) => {
@@ -372,5 +379,6 @@ export const {
   resetSearchBar,
   deleteFileData,
   selectFile,
+  setFullscreenFile,
 } = filesSlice.actions;
 export default filesSlice.reducer;

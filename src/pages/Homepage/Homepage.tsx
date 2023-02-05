@@ -7,6 +7,7 @@ import {
   FileInfoSidebar,
   FilesList,
   RenameDialog,
+  FullScreenPreview,
 } from '@components';
 import { DataStore, Predicates } from 'aws-amplify';
 import { File } from '@models';
@@ -87,6 +88,7 @@ function Homepage() {
       <Box css={homepage}>
         <FilesList />
         <FileInfoSidebar />
+        <FullScreenPreview />
       </Box>
       <RenameDialog
         open={!!renameFileId}
