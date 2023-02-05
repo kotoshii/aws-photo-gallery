@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -13,13 +13,19 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useAppDispatch } from '@store';
-import { getUrlByKey, toggleIsFavorite } from '@store/slices/files.slice';
+import {
+  getUrlByKey,
+  selectedFileSelector,
+  selectFile,
+  toggleIsFavorite,
+} from '@store/slices/files.slice';
 import {
   card,
   fileIcon,
   fileName,
   imagePreview,
   nonImagePreview,
+  selected,
 } from './styles';
 import {
   InsertDriveFileOutlined,
@@ -27,9 +33,10 @@ import {
   FavoriteOutlined,
   MoreVertOutlined,
 } from '@mui/icons-material';
-import mime from 'mime';
 import { File as FileModel } from '@models';
 import { FileItemMenu } from '@components';
+import { useSelector } from 'react-redux';
+import { useIsImage } from '@hooks/use-is-image';
 
 interface FilesListItemProps {
   file: FileModel;
@@ -42,10 +49,10 @@ function FilesListItem({ file }: FilesListItemProps) {
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const selectedFile = useSelector(selectedFileSelector);
 
   const { enqueueSnackbar } = useSnackbar();
-  const mimeType = useMemo(() => mime.getType(s3key), []);
-  const isImage = mimeType?.includes('image');
+  const { isImage } = useIsImage(s3key);
 
   const getUrl = async () => {
     setLoading(true);
@@ -64,7 +71,9 @@ function FilesListItem({ file }: FilesListItemProps) {
     }
   };
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
     try {
       await dispatch(
         toggleIsFavorite({ id, isFavorite: !isFavorite }),
@@ -78,7 +87,16 @@ function FilesListItem({ file }: FilesListItemProps) {
   };
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     setMenuAnchor(e.currentTarget);
+  };
+
+  const handleItemClick = () => {
+    if (selectedFile?.file.id === id) {
+      dispatch(selectFile(null));
+    } else if (url) {
+      dispatch(selectFile({ file, url }));
+    }
   };
 
   useEffect(() => {
@@ -87,7 +105,11 @@ function FilesListItem({ file }: FilesListItemProps) {
 
   return (
     <>
-      <Card css={card} elevation={0}>
+      <Card
+        css={[card, id === selectedFile?.file.id ? selected : null]}
+        elevation={0}
+        onClick={handleItemClick}
+      >
         {isImage ? (
           loading ? (
             <CardContent css={imagePreview}>

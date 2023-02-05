@@ -14,6 +14,7 @@ import { filesize } from 'filesize';
 import { FileUploadingInfo } from '@interfaces/storage/uploading-info.interface';
 import { PendingFile } from '@interfaces/pending-file.interface';
 import { useParseFilename } from '@hooks/use-parse-filename';
+import { useIsImage } from '@hooks/use-is-image';
 
 interface UploadingFileComponentProps {
   fileInfo: FileUploadingInfo;
@@ -29,7 +30,7 @@ function UploadingFileComponent({
   onDelete,
 }: UploadingFileComponentProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const isImage = pendingFile._fileObj.type.includes('image');
+  const { isImage } = useIsImage(pendingFile._fileObj.name);
 
   useEffect(() => {
     if (isImage) {

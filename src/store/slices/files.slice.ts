@@ -30,6 +30,7 @@ export interface FilesState {
   uploadingInfo: UploadingInfo;
   loading: boolean;
   _resetSearchBarHook: number;
+  selectedFile: { file: FileModel; url: string } | null;
 }
 
 const initialState: FilesState = {
@@ -51,6 +52,7 @@ const initialState: FilesState = {
   },
   loading: false,
   _resetSearchBarHook: 0,
+  selectedFile: null,
 };
 
 function uploadFileToS3(
@@ -152,6 +154,10 @@ export const filesDataSelector = createSelector(
 export const fileDataSelector = createSelector(
   [filesDataSelector, (state, fileId: string) => fileId],
   (data, fileId) => data[fileId],
+);
+export const selectedFileSelector = createSelector(
+  filesStateSelector,
+  (state) => state.selectedFile,
 );
 
 export const updateUserAvatar = createAsyncThunk(
@@ -333,6 +339,12 @@ const filesSlice = createSlice({
       delete newFileData[payload];
       state.data = newFileData;
     },
+    selectFile(
+      state,
+      { payload }: PayloadAction<{ file: FileModel; url: string } | null>,
+    ) {
+      state.selectedFile = payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchFiles.pending, (state) => {
@@ -359,5 +371,6 @@ export const {
   resetFilesFilters,
   resetSearchBar,
   deleteFileData,
+  selectFile,
 } = filesSlice.actions;
 export default filesSlice.reducer;

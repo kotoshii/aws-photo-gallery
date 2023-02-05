@@ -13,6 +13,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import DeleteIcon from '@mui/icons-material/Delete';
 import { filesize } from 'filesize';
 import { EditableTitle } from '@components';
+import { useIsImage } from '@hooks/use-is-image';
 
 interface PendingFileComponentProps {
   file: PendingFile;
@@ -30,7 +31,7 @@ function PendingFileComponent({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [editingDescription, setEditingDescription] = useState(false);
 
-  const isImage = file._fileObj.type.includes('image');
+  const { isImage } = useIsImage(file._fileObj.name);
 
   useEffect(() => {
     if (isImage) {

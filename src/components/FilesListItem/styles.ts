@@ -4,6 +4,7 @@ export const card = css`
   width: 285px;
   height: 285px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  background-color: #f8f9fa;
 `;
 
 export const imagePreview = css`
@@ -32,4 +33,8 @@ export const fileName = css`
   display: -webkit-box;
   text-overflow: ellipsis;
   overflow: hidden;
+`;
+
+export const selected = css`
+  outline: 4px solid #1976d2;
 `;
