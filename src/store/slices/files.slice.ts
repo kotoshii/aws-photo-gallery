@@ -168,7 +168,7 @@ export const fileDataSelector = createSelector(
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
   async (file: File) => {
-    const { key } = await Storage.put('avatar.jpg', file);
+    const { key } = await Storage.put('avatar/avatar.jpg', file);
     return await Storage.get(key);
   },
 );
