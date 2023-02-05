@@ -21,17 +21,15 @@ Amplify.configure(AwsConfig);
 Storage.configure({ level: 'private' });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <StoreProvider store={store}>
-          <SnackbarProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <App />
-            </LocalizationProvider>
-          </SnackbarProvider>
-        </StoreProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <StoreProvider store={store}>
+        <SnackbarProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <App />
+          </LocalizationProvider>
+        </SnackbarProvider>
+      </StoreProvider>
+    </ThemeProvider>
+  </BrowserRouter>,
 );
