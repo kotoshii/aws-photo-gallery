@@ -1,7 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
+  CircularProgress,
   Dialog,
   Divider,
   Grid,
@@ -9,30 +10,161 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  filesDataSelector,
   fullscreenFileSelector,
+  getUrlByKey,
   setFullscreenFile,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@store';
-import { fileInfoWrapper, image, preview } from './styles';
+import { fileInfoWrapper, image, nextPrevButton, preview } from './styles';
 import dayjs from 'dayjs';
 import { filesize } from 'filesize';
 import { DATE_FORMAT } from '@constants/common';
-import { Close } from '@mui/icons-material';
+import {
+  ArrowBackIosOutlined,
+  ArrowForwardIosOutlined,
+  Close,
+} from '@mui/icons-material';
+import { File as FileModel } from '@models';
+import mime from 'mime';
+import { useSnackbar } from 'notistack';
 
 function FullScreenPreview() {
   const dispatch = useAppDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const fullscreenFile = useSelector(fullscreenFileSelector);
+  const files = useSelector(filesDataSelector);
+  const { file, url: fileUrl } = fullscreenFile || {};
+
+  const filesIds = useMemo(() => Object.keys(files), [files]);
+  const currentIndex = fullscreenFile
+    ? filesIds.indexOf(fullscreenFile?.file?.id)
+    : -1;
+
+  const isImage = (file: FileModel) => {
+    const mimeType = mime.getType(file.s3key);
+    return !!mimeType?.includes('image');
+  };
+
+  const findNextImageIndex = (currentIndex: number): number => {
+    if (currentIndex === filesIds.length - 1) {
+      return currentIndex;
+    }
+
+    const index = currentIndex + 1;
+    const id = filesIds[index];
+
+    if (!isImage(files[id])) {
+      return findNextImageIndex(index);
+    }
+
+    return index;
+  };
+
+  const findPrevImageIndex = (currentIndex: number): number => {
+    if (currentIndex === 0) {
+      return currentIndex;
+    }
+
+    const index = currentIndex - 1;
+    const id = filesIds[index];
+
+    if (!isImage(files[id])) {
+      return findPrevImageIndex(index);
+    }
+
+    return index;
+  };
+
+  const prevImageIndex =
+    currentIndex !== -1 ? findPrevImageIndex(currentIndex) : -1;
+  const nextImageIndex =
+    currentIndex !== -1 ? findNextImageIndex(currentIndex) : -1;
 
   const handleClose = () => {
     dispatch(setFullscreenFile(null));
   };
 
-  const { file, url } = fullscreenFile || {};
+  const getUrl = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    try {
+      const url = await dispatch(
+        getUrlByKey({ key: file.s3key, filename: file.filename }),
+      ).unwrap();
+      setUrl(url);
+    } catch (e) {
+      enqueueSnackbar('Error while loading image preview.', {
+        autoHideDuration: 5000,
+        variant: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (fileUrl) {
+      setUrl(fileUrl);
+    } else if (fullscreenFile) {
+      void getUrl();
+    }
+  }, [fullscreenFile]);
+
+  const handleNextClick = () => {
+    if (
+      currentIndex === filesIds.length - 1 ||
+      currentIndex === nextImageIndex
+    ) {
+      return;
+    }
+
+    const id = filesIds[nextImageIndex];
+    const file = files[id];
+
+    dispatch(setFullscreenFile({ file }));
+  };
+
+  const handlePrevClick = () => {
+    if (currentIndex === 0 || currentIndex === prevImageIndex) {
+      return;
+    }
+
+    const id = filesIds[prevImageIndex];
+    const file = files[id];
+
+    dispatch(setFullscreenFile({ file }));
+  };
 
   return (
     <Dialog open={!!fullscreenFile} onClose={handleClose} css={preview}>
-      <Box css={image(url as string)}></Box>
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width={1}
+          height={1}
+          bgcolor="#212121"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box css={image(url as string)}>
+          <Box css={nextPrevButton} onClick={handlePrevClick}>
+            <ArrowBackIosOutlined />
+          </Box>
+          <Box css={nextPrevButton} onClick={handleNextClick}>
+            <ArrowForwardIosOutlined />
+          </Box>
+        </Box>
+      )}
       <Box css={fileInfoWrapper}>
         <Box display="flex">
           <IconButton onClick={handleClose} sx={{ marginLeft: 'auto' }}>

@@ -102,10 +102,7 @@ function FilesListItem({ file }: FilesListItemProps) {
 
   const handleOpenFullscreen = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-
-    if (url) {
-      dispatch(setFullscreenFile({ file, url }));
-    }
+    dispatch(setFullscreenFile({ file, url }));
   };
 
   useEffect(() => {

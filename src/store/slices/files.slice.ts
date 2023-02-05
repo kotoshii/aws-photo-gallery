@@ -19,7 +19,10 @@ import {
   UploadingInfo,
   UploadingStatus,
 } from '@interfaces/storage/uploading-info.interface';
-import { FileWithUrl } from '@interfaces/storage/file-with-url.interface';
+import {
+  FileWithOptionalUrl,
+  FileWithUrl,
+} from '@interfaces/storage/file-with-url.interface';
 
 export interface FilesState {
   showFavorites: boolean;
@@ -32,7 +35,7 @@ export interface FilesState {
   loading: boolean;
   _resetSearchBarHook: number;
   selectedFile: FileWithUrl | null;
-  fullscreenFile: FileWithUrl | null;
+  fullscreenFile: FileWithOptionalUrl | null;
 }
 
 const initialState: FilesState = {
@@ -349,7 +352,10 @@ const filesSlice = createSlice({
     selectFile(state, { payload }: PayloadAction<FileWithUrl | null>) {
       state.selectedFile = payload;
     },
-    setFullscreenFile(state, { payload }: PayloadAction<FileWithUrl | null>) {
+    setFullscreenFile(
+      state,
+      { payload }: PayloadAction<FileWithOptionalUrl | null>,
+    ) {
       state.fullscreenFile = payload;
     },
   },
