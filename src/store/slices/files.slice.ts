@@ -28,6 +28,7 @@ export interface FilesState {
   showFavorites: boolean;
   showOffline: boolean;
   data: Record<string, FileModel>;
+  savedToOffline: Record<string, boolean>;
   filters: FileFilters;
   uploadDialogOpen: boolean;
   uploadOverlayOpen: boolean;
@@ -49,6 +50,7 @@ const initialState: FilesState = {
     search: '',
   },
   data: {},
+  savedToOffline: {},
   uploadDialogOpen: false,
   uploadOverlayOpen: false,
   uploadingInfo: {
@@ -169,6 +171,10 @@ export const fullscreenFileSelector = createSelector(
   filesStateSelector,
   (state) => state.fullscreenFile,
 );
+export const isSaveToOfflineSelector = createSelector(
+  [filesStateSelector, (state, fileId: string) => fileId],
+  (state, fileId) => state.savedToOffline[fileId] || false,
+);
 
 export const updateUserAvatar = createAsyncThunk(
   'files/updateUserAvatar',
@@ -248,6 +254,14 @@ export const getUrlByKey = createAsyncThunk<
       : undefined,
   });
 });
+
+export const getBlobByKey = createAsyncThunk<Blob, { key: string }>(
+  'files/getBlobByKey',
+  async ({ key }) => {
+    const blob = await Storage.get(key, { download: true });
+    return blob.Body;
+  },
+);
 
 export const toggleIsFavorite = createAsyncThunk<
   void,
@@ -358,6 +372,14 @@ const filesSlice = createSlice({
     ) {
       state.fullscreenFile = payload;
     },
+    markFilesAsOffline(state, { payload }: PayloadAction<string[]>) {
+      payload.forEach((id) => {
+        state.savedToOffline[id] = true;
+      });
+    },
+    removeFileIdFromOffline(state, { payload }: PayloadAction<string>) {
+      delete state.savedToOffline[payload];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchFiles.pending, (state) => {
@@ -386,5 +408,7 @@ export const {
   deleteFileData,
   selectFile,
   setFullscreenFile,
+  markFilesAsOffline,
+  removeFileIdFromOffline,
 } = filesSlice.actions;
 export default filesSlice.reducer;

@@ -5,6 +5,7 @@ export const card = css`
   height: 285px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   background-color: #f8f9fa;
+  position: relative;
 `;
 
 export const imagePreview = css`
@@ -37,4 +38,12 @@ export const fileName = css`
 
 export const selected = css`
   outline: 4px solid #1976d2;
+`;
+
+export const offlineIcon = css`
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  border-radius: 100%;
+  background-color: white;
 `;

@@ -21,6 +21,7 @@
     "aws-amplify": "^5.0.7",
     "dayjs": "^1.11.7",
     "filesize": "^10.0.6",
+    "localforage": "^1.10.0",
     "lodash.debounce": "^4.0.8",
     "mime": "^3.0.0",
     "nanoid": "^4.0.0",

@@ -15,6 +15,7 @@ import { useSnackbar } from 'notistack';
 import { useAppDispatch } from '@store';
 import {
   getUrlByKey,
+  isSaveToOfflineSelector,
   selectedFileSelector,
   selectFile,
   setFullscreenFile,
@@ -26,6 +27,7 @@ import {
   fileName,
   imagePreview,
   nonImagePreview,
+  offlineIcon,
   selected,
 } from './styles';
 import {
@@ -33,6 +35,7 @@ import {
   BrokenImageOutlined,
   FavoriteOutlined,
   MoreVertOutlined,
+  DownloadForOffline,
 } from '@mui/icons-material';
 import { File as FileModel } from '@models';
 import { FileItemMenu } from '@components';
@@ -51,6 +54,9 @@ function FilesListItem({ file }: FilesListItemProps) {
   const [url, setUrl] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const selectedFile = useSelector(selectedFileSelector);
+  const isSavedToOffline = useSelector((state) =>
+    isSaveToOfflineSelector(state, id),
+  );
 
   const { enqueueSnackbar } = useSnackbar();
   const { isImage } = useIsImage(s3key);
@@ -116,6 +122,14 @@ function FilesListItem({ file }: FilesListItemProps) {
         elevation={0}
         onClick={handleItemClick}
       >
+        {isSavedToOffline && (
+          <DownloadForOffline
+            css={offlineIcon}
+            fontSize="large"
+            color="action"
+            titleAccess="Saved to offline"
+          />
+        )}
         {isImage ? (
           loading ? (
             <CardContent css={imagePreview}>

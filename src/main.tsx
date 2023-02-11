@@ -16,9 +16,18 @@ import './global.css';
 import { SnackbarProvider } from 'notistack';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import localforage from 'localforage';
+import { IDB_DATABASE, IDB_STORE } from '@constants/common';
 
 Amplify.configure(AwsConfig);
 Storage.configure({ level: 'private' });
+
+localforage.config({
+  driver: localforage.INDEXEDDB,
+  name: IDB_DATABASE,
+  version: 1,
+  storeName: IDB_STORE,
+});
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <BrowserRouter>

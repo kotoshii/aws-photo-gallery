@@ -14,9 +14,16 @@ import {
 } from '@mui/icons-material';
 import { File as FileModel } from '@models';
 import { RenameDialogContext } from '@contexts/rename-dialog.context';
-import { getUrlByKey } from '@store/slices/files.slice';
+import {
+  getBlobByKey,
+  getUrlByKey,
+  isSaveToOfflineSelector,
+  markFilesAsOffline,
+} from '@store/slices/files.slice';
 import { useAppDispatch } from '@store';
 import { useSnackbar } from 'notistack';
+import localforage from 'localforage';
+import { useSelector } from 'react-redux';
 
 interface FileItemMenuProps {
   anchor: HTMLElement | null;
@@ -31,6 +38,16 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
   const { id, s3key, filename } = file;
   const { setRenameFileId, setDeleteFileInfo } =
     useContext(RenameDialogContext);
+  const isSavedToOffline = useSelector((state) =>
+    isSaveToOfflineSelector(state, id),
+  );
+
+  const getDownloadUrl = async () => {
+    const blob = await localforage.getItem<Blob>(id);
+
+    if (isSavedToOffline && blob) return URL.createObjectURL(blob);
+    else return dispatch(getUrlByKey({ key: s3key, filename })).unwrap();
+  };
 
   const handleDeleteClick = async () => {
     setDeleteFileInfo({ id, s3key });
@@ -39,12 +56,11 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
 
   const handleDownload = async () => {
     try {
-      const url = await dispatch(
-        getUrlByKey({ key: s3key, filename }),
-      ).unwrap();
+      const url = await getDownloadUrl();
       const a = document.createElement('a');
       a.href = url;
       a.hidden = true;
+      a.download = filename;
       a.click();
       a.remove();
       onClose();
@@ -59,6 +75,25 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
   const handleRenameClick = () => {
     setRenameFileId(id);
     onClose();
+  };
+
+  const handleSaveToOffline = async () => {
+    try {
+      onClose();
+
+      const blob = await dispatch(getBlobByKey({ key: s3key })).unwrap();
+      await localforage.setItem(id, blob);
+      dispatch(markFilesAsOffline([id]));
+      enqueueSnackbar('Successfully saved file to offline', {
+        autoHideDuration: 5000,
+        variant: 'success',
+      });
+    } catch (e) {
+      enqueueSnackbar('Error while saving the file', {
+        autoHideDuration: 5000,
+        variant: 'error',
+      });
+    }
   };
 
   return (
@@ -88,7 +123,7 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
           </ListItemIcon>
           <ListItemText>Download</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={handleSaveToOffline}>
           <ListItemIcon>
             <DownloadForOffline />
           </ListItemIcon>

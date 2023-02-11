@@ -17,12 +17,15 @@ import {
   deleteFileData,
   fetchFiles,
   filtersSelector,
+  markFilesAsOffline,
+  removeFileIdFromOffline,
   setFileData,
   showFavoritesSelector,
 } from '@store/slices/files.slice';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import { RenameDialogContext } from '@contexts/rename-dialog.context';
+import localforage from 'localforage';
 
 function Homepage() {
   const dispatch = useAppDispatch();
@@ -41,6 +44,8 @@ function Homepage() {
   const fetchFilesData = async () => {
     try {
       await dispatch(fetchFiles()).unwrap();
+      const savedToOfflineIds = await localforage.keys();
+      dispatch(markFilesAsOffline(savedToOfflineIds));
     } catch (e) {
       const msg = e.message
         ? `Error while loading files: ${e.message}`
@@ -62,6 +67,8 @@ function Homepage() {
 
         if (msg.opType === 'DELETE') {
           dispatch(deleteFileData(msg.element.id));
+          void localforage.removeItem(msg.element.id);
+          dispatch(removeFileIdFromOffline(msg.element.id));
         }
       },
     );
