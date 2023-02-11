@@ -56,7 +56,7 @@ function FilePreview({ src, isImage, onFullscreenOpen }: FilePreviewProps) {
 
 function SidebarContentPlaceholder() {
   return (
-    <Paper css={sidebar}>
+    <Paper css={sidebar} elevation={0}>
       <FilePreview />
       <Typography variant="body1" color="text.secondary" fontStyle="italic">
         Select any file to see the information...
