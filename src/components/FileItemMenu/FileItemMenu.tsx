@@ -11,14 +11,17 @@ import {
   Download,
   DownloadForOffline,
   Delete,
+  DeleteForever,
 } from '@mui/icons-material';
 import { File as FileModel } from '@models';
 import { RenameDialogContext } from '@contexts/rename-dialog.context';
 import {
+  deleteFileData,
   getBlobByKey,
   getUrlByKey,
   isSaveToOfflineSelector,
   markFilesAsOffline,
+  removeFileIdFromOffline,
 } from '@store/slices/files.slice';
 import { useAppDispatch } from '@store';
 import { useSnackbar } from 'notistack';
@@ -52,6 +55,13 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
   const handleDeleteClick = async () => {
     setDeleteFileInfo({ id, s3key });
     onClose();
+  };
+
+  const handleDeleteFromOfflineClick = async () => {
+    onClose();
+    await localforage.removeItem(id);
+    dispatch(removeFileIdFromOffline(id));
+    dispatch(deleteFileData(id));
   };
 
   const handleDownload = async () => {
@@ -131,9 +141,15 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
           <ListItemIcon>
-            <Delete />
+            <DeleteForever />
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteFromOfflineClick}>
+          <ListItemIcon>
+            <Delete />
+          </ListItemIcon>
+          <ListItemText>Delete from offline</ListItemText>
         </MenuItem>
       </MenuList>
     </Popover>
