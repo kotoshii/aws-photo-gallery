@@ -334,6 +334,7 @@ function Authentication() {
 
   useEffect(() => {
     dispatch(resetFilesState());
+    localStorage.setItem('offlineMode', 'false');
   }, []);
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: TabValue) => {
@@ -342,6 +343,7 @@ function Authentication() {
 
   const handleEnableOfflineMode = async () => {
     await dispatch(setOfflineMode(true));
+    localStorage.setItem('offlineMode', 'true');
     navigate(AppRoutes.Root);
   };
 

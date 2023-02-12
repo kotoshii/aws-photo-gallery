@@ -8,8 +8,8 @@ export interface CommonState {
 }
 
 const initialState: CommonState = {
-  globalLoading: true,
-  offlineMode: false,
+  globalLoading: false,
+  offlineMode: JSON.parse(localStorage.getItem('offlineMode') || 'false'),
 };
 
 export const commonStateSelector = (state: RootState) => state.common;
