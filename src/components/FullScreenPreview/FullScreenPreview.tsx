@@ -54,7 +54,7 @@ function FullScreenPreview() {
 
   const findNextImageIndex = (currentIndex: number): number => {
     if (currentIndex === filesIds.length - 1) {
-      return currentIndex;
+      return isImage(files[filesIds[currentIndex]]) ? currentIndex : -1;
     }
 
     const index = currentIndex + 1;
@@ -69,7 +69,7 @@ function FullScreenPreview() {
 
   const findPrevImageIndex = (currentIndex: number): number => {
     if (currentIndex === 0) {
-      return currentIndex;
+      return isImage(files[filesIds[currentIndex]]) ? currentIndex : -1;
     }
 
     const index = currentIndex - 1;
@@ -130,7 +130,8 @@ function FullScreenPreview() {
   const handleNextClick = () => {
     if (
       currentIndex === filesIds.length - 1 ||
-      currentIndex === nextImageIndex
+      currentIndex === nextImageIndex ||
+      nextImageIndex === -1
     ) {
       return;
     }
@@ -142,7 +143,11 @@ function FullScreenPreview() {
   };
 
   const handlePrevClick = () => {
-    if (currentIndex === 0 || currentIndex === prevImageIndex) {
+    if (
+      currentIndex === 0 ||
+      currentIndex === prevImageIndex ||
+      prevImageIndex === -1
+    ) {
       return;
     }
 
