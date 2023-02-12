@@ -35,7 +35,7 @@ import {
   BrokenImageOutlined,
   FavoriteOutlined,
   MoreVertOutlined,
-  DownloadForOffline,
+  OfflinePin,
 } from '@mui/icons-material';
 import { File as FileModel } from '@models';
 import { FileItemMenu } from '@components';
@@ -129,7 +129,7 @@ function FilesListItem({ file }: FilesListItemProps) {
         onClick={handleItemClick}
       >
         {isSavedToOffline && (
-          <DownloadForOffline
+          <OfflinePin
             css={offlineIcon}
             fontSize="large"
             color="action"
