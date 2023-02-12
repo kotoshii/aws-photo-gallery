@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import React, { useState } from 'react';
-import { authFormCard, authPage } from './styles';
+import React, { useEffect, useState } from 'react';
+import { authFormCard, authPage, offlineButton } from './styles';
 import {
   Paper,
   Tabs,
@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
   IconButton,
+  Button,
 } from '@mui/material';
 import z, { TypeOf } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -22,13 +23,15 @@ import {
   verifyAccount,
 } from '@store/slices/auth.slice';
 import { useAppDispatch } from '@store';
-import { ArrowBackOutlined } from '@mui/icons-material';
+import { ArrowBackOutlined, CloudOff } from '@mui/icons-material';
 import { AmplifyErrorTypes } from '@constants/amplify-error-types';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import { AppRoutes } from '@constants/app-routes';
+import { setOfflineMode } from '@store/slices/common.slice';
+import { resetFilesState } from '@store/slices/files.slice';
 
 enum TabValue {
   SignIn,
@@ -323,15 +326,37 @@ function VerifyAccountForm({ setNeedsConfirmation, setTab }: FormProps) {
 }
 
 function Authentication() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [tab, setTab] = useState<TabValue>(TabValue.SignIn);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
+
+  useEffect(() => {
+    dispatch(resetFilesState());
+  }, []);
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: TabValue) => {
     setTab(newValue);
   };
 
+  const handleEnableOfflineMode = async () => {
+    await dispatch(setOfflineMode(true));
+    navigate(AppRoutes.Root);
+  };
+
   return (
     <Grid css={authPage} container>
+      <Button
+        variant="contained"
+        css={offlineButton}
+        disableElevation
+        color="inherit"
+        startIcon={<CloudOff />}
+        onClick={handleEnableOfflineMode}
+      >
+        Use in offline mode
+      </Button>
       <Grid item xs={12} sm={8} md={7} lg={6} xl={4}>
         <Paper css={authFormCard}>
           {needsConfirmation ? (

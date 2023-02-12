@@ -29,6 +29,7 @@ import {
 import { File as FileModel } from '@models';
 import mime from 'mime';
 import { useSnackbar } from 'notistack';
+import localforage from 'localforage';
 
 function FullScreenPreview() {
   const dispatch = useAppDispatch();
@@ -90,15 +91,24 @@ function FullScreenPreview() {
     dispatch(setFullscreenFile(null));
   };
 
+  const _getDownloadUrl = async () => {
+    if (!file) return;
+    const blob = await localforage.getItem<Blob>(file.id);
+
+    if (blob) return URL.createObjectURL(blob);
+    else
+      return dispatch(
+        getUrlByKey({ key: file.s3key, filename: file.filename }),
+      ).unwrap();
+  };
+
   const getUrl = async () => {
     if (!file) return;
 
     setLoading(true);
     try {
-      const url = await dispatch(
-        getUrlByKey({ key: file.s3key, filename: file.filename }),
-      ).unwrap();
-      setUrl(url);
+      const url = await _getDownloadUrl();
+      setUrl(url || '');
     } catch (e) {
       enqueueSnackbar('Error while loading image preview.', {
         autoHideDuration: 5000,

@@ -23,10 +23,18 @@ import {
   toggleShowOffline,
 } from '@store/slices/files.slice';
 import { useSelector } from 'react-redux';
-import { Close } from '@mui/icons-material';
+import { Close, Logout } from '@mui/icons-material';
+import {
+  offlineModeSelector,
+  setOfflineMode,
+} from '@store/slices/common.slice';
+import { useNavigate } from 'react-router-dom';
+import { AppRoutes } from '@constants/app-routes';
 
 function NavbarStorage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [filtersDropdownAnchor, setFiltersDropdownAnchor] =
     useState<HTMLElement | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +42,7 @@ function NavbarStorage() {
   const showFavorites = useSelector(showFavoritesSelector);
   const showOffline = useSelector(showOfflineSelector);
   const resetSearchBarHook = useSelector(resetSearchBarHookSelector);
+  const offlineMode = useSelector(offlineModeSelector);
 
   const debouncedSearchChange = useMemo(
     () =>
@@ -74,6 +83,11 @@ function NavbarStorage() {
     debouncedSearchChange(query);
   };
 
+  const handleDisableOfflineMode = () => {
+    dispatch(setOfflineMode(false));
+    navigate(AppRoutes.Auth);
+  };
+
   return (
     <NavbarEmpty>
       <TextField
@@ -105,19 +119,28 @@ function NavbarStorage() {
         icon={<CloudDownloadIcon />}
         onClick={handleOfflineClick}
         css={actionButton}
-        active={showOffline}
+        active={showOffline || offlineMode}
+        disabled={offlineMode}
       />
       <Box ml="auto" display="flex" justifyContent="center" alignItems="center">
-        <Button
-          color="inherit"
-          startIcon={<CloudUploadIcon />}
-          variant="contained"
-          css={uploadButton}
-          onClick={handleUploadDialogButtonClick}
-        >
-          upload new file
-        </Button>
-        <ExpandableAvatarProfile />
+        {!offlineMode && (
+          <Button
+            color="inherit"
+            startIcon={<CloudUploadIcon />}
+            variant="contained"
+            css={uploadButton}
+            onClick={handleUploadDialogButtonClick}
+          >
+            upload new file
+          </Button>
+        )}
+        {!offlineMode ? (
+          <ExpandableAvatarProfile />
+        ) : (
+          <IconButton onClick={handleDisableOfflineMode}>
+            <Logout fontSize="inherit" />
+          </IconButton>
+        )}
       </Box>
       <FiltersDropdown
         anchorEl={filtersDropdownAnchor}

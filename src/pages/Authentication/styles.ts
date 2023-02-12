@@ -13,3 +13,11 @@ export const authPage = css`
 export const authFormCard = css`
   box-shadow: 0 4px 64px rgba(0, 0, 0, 0.3);
 `;
+
+export const offlineButton = css`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  height: 46px;
+  border-radius: 12px;
+`;

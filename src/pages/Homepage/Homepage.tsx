@@ -21,11 +21,13 @@ import {
   removeFileIdFromOffline,
   setFileData,
   showFavoritesSelector,
+  showOfflineSelector,
 } from '@store/slices/files.slice';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import { RenameDialogContext } from '@contexts/rename-dialog.context';
 import localforage from 'localforage';
+import { offlineModeSelector } from '@store/slices/common.slice';
 
 function Homepage() {
   const dispatch = useAppDispatch();
@@ -40,12 +42,14 @@ function Homepage() {
   const { dateFrom, dateTo, sizeFrom, sizeTo, search } =
     useSelector(filtersSelector);
   const showOnlyFavs = useSelector(showFavoritesSelector);
+  const showOnlyOffline = useSelector(showOfflineSelector);
+  const offlineMode = useSelector(offlineModeSelector);
 
   const fetchFilesData = async () => {
     try {
-      await dispatch(fetchFiles()).unwrap();
       const savedToOfflineIds = await localforage.keys();
       dispatch(markFilesAsOffline(savedToOfflineIds));
+      await dispatch(fetchFiles()).unwrap();
     } catch (e) {
       const msg = e.message
         ? `Error while loading files: ${e.message}`
@@ -56,7 +60,16 @@ function Homepage() {
 
   useEffect(() => {
     void fetchFilesData();
-  }, [dateFrom, dateTo, sizeFrom, sizeTo, search, showOnlyFavs]);
+  }, [
+    dateFrom,
+    dateTo,
+    sizeFrom,
+    sizeTo,
+    search,
+    showOnlyFavs,
+    showOnlyOffline,
+    offlineMode,
+  ]);
 
   useEffect(() => {
     const subscription = DataStore.observe(File, Predicates.ALL).subscribe(

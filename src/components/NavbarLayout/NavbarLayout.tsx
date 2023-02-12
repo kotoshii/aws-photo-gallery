@@ -18,12 +18,15 @@ import {
 } from '@store/slices/files.slice';
 import { useAppDispatch } from '@store';
 import { ActiveUploadsMap } from '@interfaces/storage/uploading-info.interface';
+import { useSelector } from 'react-redux';
+import { offlineModeSelector } from '@store/slices/common.slice';
 
 function NavbarLayout() {
   const dispatch = useAppDispatch();
 
   const matchRoot = useMatch(AppRoutes.Root);
   const matchSettings = useMatch(AppRoutes.AccountSettings);
+  const offlineMode = useSelector(offlineModeSelector);
 
   const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>(
     {},
@@ -67,11 +70,15 @@ function NavbarLayout() {
     <>
       {navbar}
       <PendingFilesContext.Provider value={{ pendingFiles, setPendingFiles }}>
-        <UploadFileDialog onUpload={handleUploadClick} />
-        <UploadingOverlay
-          uploads={uploads}
-          onCancelUpload={handleCancelUpload}
-        />
+        {!offlineMode && (
+          <>
+            <UploadFileDialog onUpload={handleUploadClick} />
+            <UploadingOverlay
+              uploads={uploads}
+              onCancelUpload={handleCancelUpload}
+            />
+          </>
+        )}
       </PendingFilesContext.Provider>
       <Box px={4} height={1} width={1} css={navbarLayout}>
         <Outlet />

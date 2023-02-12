@@ -4,13 +4,17 @@ import { fetchUserData } from '@store/slices/auth.slice';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoutes } from '@constants/app-routes';
 import { useSelector } from 'react-redux';
-import { globalLoadingSelector } from '@store/slices/common.slice';
+import {
+  globalLoadingSelector,
+  offlineModeSelector,
+} from '@store/slices/common.slice';
 import { Box, CircularProgress } from '@mui/material';
 import { useIsAuthenticated } from '@hooks/use-is-authenticated';
 
 function ProtectedRoute() {
   const dispatch = useAppDispatch();
   const globalLoading = useSelector(globalLoadingSelector);
+  const offlineMode = useSelector(offlineModeSelector);
   const isAuthenticated = useIsAuthenticated();
 
   const fetchUser = async () => {
@@ -18,10 +22,10 @@ function ProtectedRoute() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !offlineMode) {
       void fetchUser();
     }
-  }, []);
+  }, [offlineMode]);
 
   if (globalLoading) {
     return (
@@ -38,7 +42,11 @@ function ProtectedRoute() {
     );
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to={AppRoutes.Auth} />;
+  return isAuthenticated || offlineMode ? (
+    <Outlet />
+  ) : (
+    <Navigate to={AppRoutes.Auth} />
+  );
 }
 
 export default ProtectedRoute;

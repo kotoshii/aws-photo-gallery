@@ -8,10 +8,13 @@ import { HubCallback } from '@aws-amplify/core/src/Hub';
 import { useAppDispatch } from '@store';
 import { resetUser } from '@store/slices/auth.slice';
 import { NavbarLayout, ProtectedRoute } from '@components';
+import { useSelector } from 'react-redux';
+import { offlineModeSelector } from '@store/slices/common.slice';
 
 function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const offlineMode = useSelector(offlineModeSelector);
 
   useEffect(() => {
     const listener: HubCallback = (data) => {
@@ -37,10 +40,12 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<NavbarLayout />}>
               <Route path={AppRoutes.Root} element={<Homepage />} />
-              <Route
-                path={AppRoutes.AccountSettings}
-                element={<AccountSettings />}
-              />
+              {!offlineMode && (
+                <Route
+                  path={AppRoutes.AccountSettings}
+                  element={<AccountSettings />}
+                />
+              )}
             </Route>
           </Route>
           <Route path={AppRoutes.Auth} element={<Authentication />} />

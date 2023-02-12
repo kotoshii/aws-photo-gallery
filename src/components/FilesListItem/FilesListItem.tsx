@@ -41,6 +41,7 @@ import { File as FileModel } from '@models';
 import { FileItemMenu } from '@components';
 import { useSelector } from 'react-redux';
 import { useIsImage } from '@hooks/use-is-image';
+import localforage from 'localforage';
 
 interface FilesListItemProps {
   file: FileModel;
@@ -61,12 +62,17 @@ function FilesListItem({ file }: FilesListItemProps) {
   const { enqueueSnackbar } = useSnackbar();
   const { isImage } = useIsImage(s3key);
 
+  const _getDownloadUrl = async () => {
+    const blob = await localforage.getItem<Blob>(id);
+
+    if (isSavedToOffline && blob) return URL.createObjectURL(blob);
+    else return dispatch(getUrlByKey({ key: s3key, filename })).unwrap();
+  };
+
   const getUrl = async () => {
     setLoading(true);
     try {
-      const url = await dispatch(
-        getUrlByKey({ key: s3key, filename }),
-      ).unwrap();
+      const url = await _getDownloadUrl();
       setUrl(url);
     } catch (e) {
       enqueueSnackbar('Error while loading image preview.', {

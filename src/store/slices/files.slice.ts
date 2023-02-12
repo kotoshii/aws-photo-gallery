@@ -23,6 +23,8 @@ import {
   FileWithOptionalUrl,
   FileWithUrl,
 } from '@interfaces/storage/file-with-url.interface';
+import localforage from 'localforage';
+import pick from 'lodash.pick';
 
 export interface FilesState {
   showFavorites: boolean;
@@ -226,7 +228,9 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
       files: {
         filters: { dateFrom, dateTo, sizeFrom, sizeTo, search },
         showFavorites,
+        showOffline,
       },
+      common: { offlineMode },
     } = getState() as RootState;
 
     const files = await DataStore.query(FileModel, (c) =>
@@ -240,7 +244,17 @@ export const fetchFiles = createAsyncThunk<Record<string, FileModel>>(
       ]),
     );
 
-    return files.reduce((acc, curr) => ({ ...acc, [curr.id]: curr }), {});
+    const filesMap = files.reduce<Record<string, FileModel>>(
+      (acc, curr) => ({ ...acc, [curr.id]: curr }),
+      {},
+    );
+
+    if (showOffline || offlineMode) {
+      const offlineFiles = await localforage.keys();
+      return pick(filesMap, offlineFiles);
+    }
+
+    return filesMap;
   },
 );
 
@@ -380,6 +394,9 @@ const filesSlice = createSlice({
     removeFileIdFromOffline(state, { payload }: PayloadAction<string>) {
       delete state.savedToOffline[payload];
     },
+    resetFilesState() {
+      return initialState;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchFiles.pending, (state) => {
@@ -410,5 +427,6 @@ export const {
   setFullscreenFile,
   markFilesAsOffline,
   removeFileIdFromOffline,
+  resetFilesState,
 } = filesSlice.actions;
 export default filesSlice.reducer;
