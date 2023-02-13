@@ -94,7 +94,9 @@ function SignInForm({ setNeedsConfirmation }: FormProps) {
 
   const loading = useSelector(loadingSelector);
 
-  const onSubmitClick: SubmitHandler<SignInValues> = async (values) => {
+  const onSubmitClick: SubmitHandler<Required<SignInValues>> = async (
+    values,
+  ) => {
     try {
       await dispatch(login(values)).unwrap();
       navigate(AppRoutes.Root);
@@ -268,7 +270,9 @@ function VerifyAccountForm({ setNeedsConfirmation, setTab }: FormProps) {
 
   const loading = useSelector(loadingSelector);
 
-  const onSubmitClick: SubmitHandler<VerifyValues> = async (values) => {
+  const onSubmitClick: SubmitHandler<Required<VerifyValues>> = async (
+    values,
+  ) => {
     try {
       await dispatch(verifyAccount(values)).unwrap();
       setNeedsConfirmation(false);
