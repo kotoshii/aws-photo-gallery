@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3awsphotogallerystorage0551dbd2",
+  "bucketName": "awsphotogallery-storage-0551dbd2",
+  "policyUUID": "2f8cc6ba",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

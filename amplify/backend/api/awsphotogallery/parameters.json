@@ -1,0 +1,12 @@
+{
+  "AppSyncApiName": "awsphotogallery",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authawsphotogallery72c47f2a",
+      "Outputs.UserPoolId"
+    ]
+  },
+  "AuthModeLastUpdated": "2023-02-02T18:29:01.746Z"
+}

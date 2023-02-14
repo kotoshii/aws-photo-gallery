@@ -1,0 +1,15 @@
+html, body, #root, .App {
+    height: 100%;
+    background-color: #E9ECEF;
+    margin: 0
+}
+
+.App {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.PrivatePickersYear-yearButton {
+    border-radius: 12px !important;
+}

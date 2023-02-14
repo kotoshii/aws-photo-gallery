@@ -1,0 +1,12 @@
+type File @model @auth(rules: [{allow: owner}]) {
+  id: ID!
+  s3key: String!
+  filename: String!
+  isFavorite: Boolean!
+  description: String
+  owner: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+  size: Int
+}
+ 
