@@ -91,7 +91,7 @@ function FileItemMenu({ anchor, onClose, file }: FileItemMenuProps) {
     try {
       onClose();
 
-      const blob = await dispatch(getBlobByKey({ key: s3key })).unwrap();
+      const blob = await dispatch(getBlobByKey(s3key)).unwrap();
       await localforage.setItem(id, blob);
       dispatch(markFilesAsOffline([id]));
       enqueueSnackbar('Successfully saved file to offline', {

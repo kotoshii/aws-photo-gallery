@@ -269,11 +269,11 @@ export const getUrlByKey = createAsyncThunk<
   });
 });
 
-export const getBlobByKey = createAsyncThunk<Blob, { key: string }>(
+export const getBlobByKey = createAsyncThunk<Blob, string>(
   'files/getBlobByKey',
-  async ({ key }) => {
+  async (key) => {
     const blob = await Storage.get(key, { download: true });
-    return blob.Body;
+    return blob.Body as Blob;
   },
 );
 
