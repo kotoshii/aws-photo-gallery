@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useState } from 'react';
-import { authFormCard, authPage, offlineButton } from './styles';
+import { authFormCard, authPage, offlineAlert, offlineButton } from './styles';
 import {
   Paper,
   Tabs,
@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppRoutes } from '@constants/app-routes';
 import { setOfflineMode } from '@store/slices/common.slice';
 import { resetFilesState } from '@store/slices/files.slice';
+import { OfflineAlert } from '@components';
 
 enum TabValue {
   SignIn,
@@ -364,6 +365,7 @@ function Authentication() {
         Use in offline mode
       </Button>
       <Grid item xs={12} sm={8} md={7} lg={6} xl={4}>
+        <OfflineAlert standalone noButton css={offlineAlert} />
         <Paper css={authFormCard}>
           {needsConfirmation ? (
             <VerifyAccountForm

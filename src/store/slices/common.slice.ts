@@ -5,11 +5,13 @@ import { fetchUserData, login } from '@store/slices/auth.slice';
 export interface CommonState {
   globalLoading: boolean;
   offlineMode: boolean;
+  isOffline: boolean;
 }
 
 const initialState: CommonState = {
   globalLoading: false,
   offlineMode: JSON.parse(localStorage.getItem('offlineMode') || 'false'),
+  isOffline: !window.navigator.onLine,
 };
 
 export const commonStateSelector = (state: RootState) => state.common;
@@ -21,6 +23,10 @@ export const offlineModeSelector = createSelector(
   commonStateSelector,
   (state) => state.offlineMode,
 );
+export const isOfflineSelector = createSelector(
+  commonStateSelector,
+  (state) => state.isOffline,
+);
 
 const commonSlice = createSlice({
   name: 'common',
@@ -28,6 +34,9 @@ const commonSlice = createSlice({
   reducers: {
     setOfflineMode(state, { payload }: PayloadAction<boolean>) {
       state.offlineMode = payload;
+    },
+    setIsOffline(state, { payload }: PayloadAction<boolean>) {
+      state.isOffline = payload;
     },
   },
   extraReducers: (builder) => {
@@ -49,5 +58,5 @@ const commonSlice = createSlice({
   },
 });
 
-export const { setOfflineMode } = commonSlice.actions;
+export const { setOfflineMode, setIsOffline } = commonSlice.actions;
 export default commonSlice.reducer;

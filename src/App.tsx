@@ -9,7 +9,7 @@ import { useAppDispatch } from '@store';
 import { resetUser } from '@store/slices/auth.slice';
 import { NavbarLayout, ProtectedRoute } from '@components';
 import { useSelector } from 'react-redux';
-import { offlineModeSelector } from '@store/slices/common.slice';
+import { offlineModeSelector, setIsOffline } from '@store/slices/common.slice';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -29,7 +29,25 @@ function App() {
       }
     };
 
-    Hub.listen('auth', listener);
+    const unsubscribeHubAuthListener = Hub.listen('auth', listener);
+
+    const offlineListener = () => {
+      dispatch(setIsOffline(true));
+    };
+
+    const onlineListener = () => {
+      dispatch(setIsOffline(false));
+    };
+
+    window.addEventListener('offline', offlineListener);
+    window.addEventListener('online', onlineListener);
+
+    return () => {
+      unsubscribeHubAuthListener();
+
+      window.removeEventListener('offline', offlineListener);
+      window.removeEventListener('online', onlineListener);
+    };
   }, []);
 
   return (

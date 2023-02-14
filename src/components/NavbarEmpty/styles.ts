@@ -12,3 +12,8 @@ export const navbarEmpty = css`
   align-items: center;
   z-index: 999;
 `;
+
+export const withAlert = css`
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+`;

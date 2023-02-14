@@ -21,3 +21,7 @@ export const offlineButton = css`
   height: 46px;
   border-radius: 12px;
 `;
+
+export const offlineAlert = css`
+  margin-bottom: 16px;
+`;
