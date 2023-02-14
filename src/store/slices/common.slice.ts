@@ -9,7 +9,7 @@ export interface CommonState {
 }
 
 const initialState: CommonState = {
-  globalLoading: false,
+  globalLoading: !JSON.parse(localStorage.getItem('offlineMode')),
   offlineMode: JSON.parse(localStorage.getItem('offlineMode') || 'false'),
   isOffline: !window.navigator.onLine,
 };

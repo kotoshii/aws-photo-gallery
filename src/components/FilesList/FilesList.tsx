@@ -11,7 +11,7 @@ function FilesList() {
   const filesArr = Object.values(files);
 
   return (
-    <Grid container spacing={3} css={fileList} flexShrink="inherit">
+    <Grid container css={fileList} flexShrink="inherit" gap={3}>
       {filesArr.map((file) => (
         <Grid item key={file.id}>
           <FilesListItem file={file} />
