@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, useRef, useState } from 'react';
-import { Divider, Grid, Paper, TextField } from '@mui/material';
+import { Divider, Grid, Paper, TextField, Typography } from '@mui/material';
 import {
   accountSettings,
   accountSettingsPage,
@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { User } from '@interfaces/user.interface';
 import { AmplifyErrorTypes } from '@constants/amplify-error-types';
 import { updateUserAvatar } from '@store/slices/files.slice';
+import { FIVE_MB } from '@constants/common';
 
 const updateNameSchema = z.object({
   name: z.string().nonempty(),
@@ -238,7 +239,7 @@ function AccountSettings() {
     if (!e.target.files) return;
     const file = e.target.files[0];
 
-    if (file) {
+    if (file && file.size <= FIVE_MB) {
       void uploadAvatar(file);
     }
   };
@@ -257,13 +258,17 @@ function AccountSettings() {
           >
             change profile pic
             <input
+              accept="image/*"
               ref={fileInputRef}
               type="file"
               style={{ display: 'none' }}
               onChange={handleAvatarChange}
             />
           </LoadingButton>
-          <Divider flexItem css={divider} />
+          <Typography variant="caption" mt={1.5} color="action">
+            Any image or GIF, up to 5 MB
+          </Typography>
+          <Divider flexItem sx={{ margin: '24px 0 32px' }} />
           <UpdateNameForm />
           <Divider flexItem css={divider} />
           <ChangePasswordForm />

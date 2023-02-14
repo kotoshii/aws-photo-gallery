@@ -46,6 +46,7 @@ function DragDropArea({ onDrop, decreaseHeight }: DragDropAreaProps) {
     >
       <Box css={uploadArea} {...getRootProps()}>
         <Typography variant="h6">Drag files here or click to select</Typography>
+        <Typography variant="body2">Any file up to 50 MB</Typography>
         <CloudUploadIcon fontSize="large" />
         <input css={inputElement} {...getInputProps()} />
       </Box>

@@ -45,4 +45,8 @@ export const toggleOverlayButton = css`
   border-radius: 0 16px 16px 0;
   max-height: 68.02px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    background-color: #eeeff0;
+  }
 `;
